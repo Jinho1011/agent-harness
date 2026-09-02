@@ -1,0 +1,3 @@
+interface:
+  display_name: "Add Shared Skill"
+  short_description: "Vendor a skill into the harness for Claude, Codex, and Cursor"
