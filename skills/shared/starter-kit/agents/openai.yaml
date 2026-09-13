@@ -1,0 +1,3 @@
+interface:
+  display_name: "Starter Kit"
+  short_description: "Scaffold services with guided setup questions"

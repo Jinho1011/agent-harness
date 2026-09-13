@@ -127,6 +127,12 @@
       "installPath": "~/.agents/skills/setup-matt-pocock-skills"
     },
     {
+      "name": "starter-kit",
+      "source": "local",
+      "treeSha256": "b6d94cfecfd845e8ef0544495e5c48f9df2d9842530c9dbd69cdcb33c5c5801b",
+      "installPath": "~/.agents/skills/starter-kit"
+    },
+    {
       "name": "tdd",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
