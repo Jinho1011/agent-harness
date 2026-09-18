@@ -1,6 +1,6 @@
 # agent-harness
 
-One repository that gives **Claude Code**, **Codex CLI**, and **Cursor CLI** the same instructions,
+One repository that gives **Claude Code**, **Codex CLI**, **Cursor CLI**, and **Antigravity CLI (`agy`)** the same instructions,
 skills, guard hook, verifier subagent, and MCP servers on every machine you use. Clone it, run one
 script, and each agent reads the same `AGENTS.md`, sees the same skills, and stops before the same
 destructive commands. Run it again after `git pull` to update; `doctor.sh` proves the result.
@@ -9,11 +9,11 @@ destructive commands. Run it again after `git pull` to update; `doctor.sh` prove
 
 | Area | Installed to | Source in this repo |
 |---|---|---|
-| Shared instructions | `~/.agents/AGENTS.md`; `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` are symlinks to it | `AGENTS.md` |
-| Shared skills (25) | `~/.agents/skills/<name>` (read by Codex and Cursor) + `~/.claude/skills/<name>` symlink | `skills/shared/` |
-| Destructive-command guard hook | `~/.agents/hooks/guard-destructive.sh`, registered in `~/.claude/settings.json`, `~/.codex/hooks.json`, `~/.cursor/hooks.json` | `hooks/` |
-| `verifier` subagent | `~/.claude/agents/verifier.md`; rendered to `~/.codex/agents/verifier.toml` | `agents/` |
-| MCP servers | `claude mcp` user scope, `[mcp_servers.*]` in `~/.codex/config.toml`, `~/.cursor/mcp.json` | `mcp.json` |
+| Shared instructions | `~/.agents/AGENTS.md`; `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.gemini/config/rules/AGENTS.md` are symlinks to it | `AGENTS.md` |
+| Shared skills (26) | `~/.agents/skills/<name>` (read by Codex and Cursor) + `~/.claude/skills/<name>` and `~/.gemini/config/skills/<name>` symlinks | `skills/shared/` |
+| Destructive-command guard hook | `~/.agents/hooks/guard-destructive.sh`, registered in `~/.claude/settings.json`, `~/.codex/hooks.json`, `~/.cursor/hooks.json`, `~/.gemini/config/hooks.json` | `hooks/` |
+| `verifier` subagent | `~/.claude/agents/verifier.md`; rendered to `~/.codex/agents/verifier.toml` and `~/.gemini/config/agents/verifier/agent.md` | `agents/` |
+| MCP servers | `claude mcp` user scope, `[mcp_servers.*]` in `~/.codex/config.toml`, `~/.cursor/mcp.json`, `~/.gemini/config/mcp_config.json` | `mcp.json` |
 
 Everything is copied from this repository, backed up before it is replaced, and verified by
 `scripts/doctor.sh`. Anything not in the table is deliberately left to the machine.
@@ -22,7 +22,7 @@ Everything is copied from this repository, backed up before it is replaced, and 
 
 - bash 3.2 or newer (the stock macOS bash works), `jq`, `git`, and `sha256sum` or `shasum`
 - Linux or macOS, including WSL
-- Optional: the `claude`, `codex`, and `cursor-agent` CLIs. Registration steps for an agent that is
+- Optional: the `claude`, `codex`, `cursor-agent`, and `agy` CLIs. Registration steps for an agent that is
   not installed are skipped.
 
 ## Quick start
@@ -74,29 +74,32 @@ analyses that found definitions of done, escalation rules, and explicit priority
 actually moves agent behavior.
 
 Cursor CLI reads project-level `AGENTS.md` and `CLAUDE.md` but has no file-based global
-instruction file; keep cross-project guidance for Cursor in the app's User Rules.
+instruction file; keep cross-project guidance for Cursor in the app's User Rules. Antigravity CLI (`agy`)
+reads `~/.gemini/config/rules/AGENTS.md` globally, as well as project-level `AGENTS.md` and `GEMINI.md`.
 
 ### Skills
 
 `skills/shared/` is the single source of truth. `install.sh` copies each skill to
 `~/.agents/skills/<name>`, which Codex and Cursor read natively, and symlinks it into
-`~/.claude/skills/<name>` for Claude Code. It prunes anything in either directory that
-`manifest.json` does not list, so a skill installed outside this repository disappears on the next
-install (it is backed up first). Every skill is pinned to an upstream commit and a tree checksum.
+`~/.claude/skills/<name>` for Claude Code and `~/.gemini/config/skills/<name>` for Antigravity (`agy`).
+It prunes anything in either directory that `manifest.json` does not list, so a skill installed
+outside this repository disappears on the next install (it is backed up first). Every skill is
+pinned to an upstream commit and a tree checksum.
 
 ### Guard hook
 
 An instruction file is advisory; `hooks/guard-destructive.sh` is not. Registered as a `PreToolUse`
-hook for Bash in Claude Code and Codex and as `beforeShellExecution` in Cursor, it reads each shell
-command and stops it when it matches a guarded pattern: force pushes, branch deletion, history
-rewrites, `git reset --hard`, recursive `rm`, `find -delete`, disk and container wipes,
-`kubectl`/`terraform` apply or destroy, `DROP TABLE`, package publishing, `gh repo delete`,
-`gh pr merge`.
+hook for Bash in Claude Code and Codex, for `run_command` in Antigravity, and as `beforeShellExecution`
+in Cursor, it reads each shell command and stops it when it matches a guarded pattern: force pushes,
+branch deletion, history rewrites, `git reset --hard`, recursive `rm`, `find -delete`, disk and
+container wipes, `kubectl`/`terraform` apply or destroy, `DROP TABLE`, package publishing,
+`gh repo delete`, `gh pr merge`.
 
-In Claude Code the answer is `ask`, which prompts even in auto mode. Codex does not support `ask`
-yet, and Cursor auto-allows `ask` under `--yolo` and in non-interactive runs, so both get `deny` with
-a reason that tells the agent to get the user's confirmation. A command prefixed with `CONFIRMED=1`
-passes the guard, which is how an agent re-runs a command after the user said yes.
+In Claude Code and Antigravity the answer is `ask`, which prompts even in auto mode. Codex does
+not support `ask` yet, and Cursor auto-allows `ask` under `--yolo` and in non-interactive runs,
+so both get `deny` with a reason that tells the agent to get the user's confirmation. A command
+prefixed with `CONFIRMED=1` passes the guard, which is how an agent re-runs a command after the
+user said yes.
 
 `install.sh` merges its entry into each agent's hook file and leaves every other hook in place.
 Codex requires each machine to trust a hook once: run `/hooks` inside `codex` after installing.
@@ -107,17 +110,18 @@ Codex requires each machine to trust a hook once: run `/hooks` inside `codex` af
 or plan and reports gaps only: requirements met or missing with file and line, out-of-scope hunks,
 and the checks it ran with their exit codes. It is the "adversarial review in a fresh context" step
 from Anthropic's guidance. Claude Code reads the markdown from `~/.claude/agents/`; `install.sh`
-renders it to `~/.codex/agents/verifier.toml` for Codex. Cursor CLI only picked up project-level
-definitions in testing, so copy `agents/verifier.md` into a project's `.cursor/agents/` when you want
-it there.
+renders it to `~/.codex/agents/verifier.toml` for Codex and `~/.gemini/config/agents/verifier/agent.md`
+for Antigravity. Cursor CLI only picked up project-level definitions in testing, so copy
+`agents/verifier.md` into a project's `.cursor/agents/` when you want it there.
 
 ### MCP servers
 
 `mcp.json` lists the servers every agent should have. Currently only Context7
 (`https://mcp.context7.com/mcp`, version-pinned library docs). `install.sh` registers each server at
-user scope in Claude Code, appends a `[mcp_servers.<name>]` table to `~/.codex/config.toml`, and
-merges it into `~/.cursor/mcp.json`. Removing a server from `mcp.json` does not unregister it; do
-that by hand (`claude mcp remove -s user <name>`, edit `config.toml`, edit `mcp.json`).
+user scope in Claude Code, appends a `[mcp_servers.<name>]` table to `~/.codex/config.toml`,
+merges it into `~/.cursor/mcp.json`, and registers it in `~/.gemini/config/mcp_config.json` (using
+`agy mcp add`). Removing a server from `mcp.json` does not unregister it; do that by hand
+(`claude mcp remove -s user <name>`, `agy mcp remove <name>`, edit `config.toml`, edit `mcp.json`).
 
 ## Customizing
 

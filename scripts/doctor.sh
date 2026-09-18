@@ -10,6 +10,7 @@ pass() { printf 'PASS  %s\n' "$1"; }
 fail() { printf 'FAIL  %s\n' "$1" >&2; failures=$((failures + 1)); }
 check() { local label=$1; shift; if "$@"; then pass "$label"; else fail "$label"; fi; }
 has_cursor() { [[ -d "$HOME/.cursor" ]] || command -v cursor-agent >/dev/null 2>&1; }
+has_agy() { [[ -d "$HOME/.gemini" ]] || command -v agy >/dev/null 2>&1; }
 
 sha256() {
   if command -v sha256sum >/dev/null; then sha256sum "$@"; else shasum -a 256 "$@"; fi
@@ -33,8 +34,10 @@ VENDORED_LIST=$(cd "$ROOT/skills/shared" && find . -mindepth 1 -maxdepth 1 -type
 SKILLS=()
 while IFS= read -r name; do SKILLS+=("$name"); done <<<"$SKILL_LIST"
 
+agy_skills=()
+if has_agy; then agy_skills=("$HOME/.gemini/config/skills"); fi
 unmanaged=$(comm -23 \
-  <(find "$HOME/.agents/skills" "$HOME/.claude/skills" -mindepth 1 -maxdepth 1 2>/dev/null | sed 's|.*/||' | LC_ALL=C sort -u) \
+  <(find "$HOME/.agents/skills" "$HOME/.claude/skills" "${agy_skills[@]}" -mindepth 1 -maxdepth 1 2>/dev/null | sed 's|.*/||' | grep -v '^synced$' | LC_ALL=C sort -u) \
   <(printf '%s\n' "$SKILL_LIST"))
 if [[ -n "$unmanaged" ]]; then
   fail "no unmanaged skills installed (found: $(tr '\n' ' ' <<<"$unmanaged"))"
@@ -49,6 +52,10 @@ for name in "${SKILLS[@]}"; do
   [[ -f "$canonical/SKILL.md" ]] && pass "$name canonical skill exists" || fail "$name canonical skill exists"
   [[ -d "$canonical" && "$(tree_sha "$canonical")" == "$expected" ]] && pass "$name pinned tree checksum" || fail "$name pinned tree checksum"
   [[ -L "$claude_link" && "$(readlink "$claude_link")" == "$canonical" ]] && pass "$name Claude symlink" || fail "$name Claude symlink"
+  if has_agy; then
+    agy_link="$HOME/.gemini/config/skills/$name"
+    [[ -L "$agy_link" && "$(readlink "$agy_link")" == "$canonical" ]] && pass "$name Antigravity symlink" || fail "$name Antigravity symlink"
+  fi
 done
 
 # ---- shared instructions ------------------------------------------------------------------
@@ -59,6 +66,11 @@ for link in "$HOME/.codex/AGENTS.md" "$HOME/.claude/CLAUDE.md"; do
   [[ -L "$link" && "$(readlink "$link")" == "$shared" ]] \
     && pass "${link#"$HOME/"} links to the shared AGENTS.md" || fail "${link#"$HOME/"} links to the shared AGENTS.md"
 done
+if has_agy; then
+  agy_rule="$HOME/.gemini/config/rules/AGENTS.md"
+  [[ -L "$agy_rule" && "$(readlink "$agy_rule")" == "$shared" ]] \
+    && pass "${agy_rule#"$HOME/"} links to the shared AGENTS.md" || fail "${agy_rule#"$HOME/"} links to the shared AGENTS.md"
+fi
 check 'shared instructions are portable' bash -c '! grep -Eq "/Users/|/home/" "$1"' _ "$shared"
 
 # ---- guard hook -----------------------------------------------------------------------------
@@ -70,6 +82,8 @@ hook_out() { printf '%s' "$2" | "$HOOK" $1 2>/dev/null; }
 sample_force='{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git push --force origin main"}}'
 sample_plain='{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git status"}}'
 sample_cursor='{"hook_event_name":"beforeShellExecution","command":"rm -rf build"}'
+sample_agy='{"toolCall":{"name":"run_command","args":{"CommandLine":"git push --force origin main"}}}'
+sample_agy_plain='{"toolCall":{"name":"run_command","args":{"CommandLine":"git status"}}}'
 jq -e '.hookSpecificOutput.permissionDecision == "ask"' <<<"$(hook_out '--decision ask' "$sample_force")" >/dev/null 2>&1 \
   && pass 'guard hook asks on a force push (Claude Code)' || fail 'guard hook asks on a force push (Claude Code)'
 jq -e '.hookSpecificOutput.permissionDecision == "deny"' <<<"$(hook_out '--decision deny' "$sample_force")" >/dev/null 2>&1 \
@@ -78,6 +92,10 @@ jq -e '.hookSpecificOutput.permissionDecision == "deny"' <<<"$(hook_out '--decis
   && pass 'guard hook stays silent on git status' || fail 'guard hook stays silent on git status'
 jq -e '.permission == "deny"' <<<"$(hook_out '--decision deny' "$sample_cursor")" >/dev/null 2>&1 \
   && pass 'guard hook denies on rm -rf (Cursor)' || fail 'guard hook denies on rm -rf (Cursor)'
+jq -e '.decision == "ask"' <<<"$(hook_out '--decision ask' "$sample_agy")" >/dev/null 2>&1 \
+  && pass 'guard hook asks on a force push (Antigravity)' || fail 'guard hook asks on a force push (Antigravity)'
+jq -e '.decision == "allow"' <<<"$(hook_out '--decision ask' "$sample_agy_plain")" >/dev/null 2>&1 \
+  && pass 'guard hook allows on git status (Antigravity)' || fail 'guard hook allows on git status (Antigravity)'
 
 count_pretooluse() {
   jq '[.hooks.PreToolUse[]? | select([.hooks[]?.command // ""] | any(contains("guard-destructive.sh")))] | length' "$1" 2>/dev/null
@@ -90,12 +108,21 @@ if has_cursor; then
   n=$(jq '[.hooks.beforeShellExecution[]? | select((.command // "") | contains("guard-destructive.sh"))] | length' "$HOME/.cursor/hooks.json" 2>/dev/null)
   [[ "$n" == 1 ]] && pass 'guard hook registered once in Cursor hooks.json' || fail 'guard hook registered once in Cursor hooks.json'
 fi
+if has_agy; then
+  count_agy=$(jq '[.["guard-destructive"].PreToolUse[]? | .hooks[]? | select((.command // "") | contains("guard-destructive.sh"))] | length' "$HOME/.gemini/config/hooks.json" 2>/dev/null)
+  [[ "$count_agy" == 1 ]] && pass 'guard hook registered once in Antigravity hooks.json' || fail 'guard hook registered once in Antigravity hooks.json'
+fi
 
 # ---- verifier subagent ---------------------------------------------------------------------
 same_file "$HOME/.claude/agents/verifier.md" "$ROOT/agents/verifier.md" \
   && pass 'verifier subagent installed for Claude Code' || fail 'verifier subagent installed for Claude Code'
 grep -q '^name = "verifier"$' "$HOME/.codex/agents/verifier.toml" 2>/dev/null && grep -q "^developer_instructions = '''" "$HOME/.codex/agents/verifier.toml" \
   && pass 'verifier subagent rendered for Codex' || fail 'verifier subagent rendered for Codex'
+if has_agy; then
+  grep -q '^name: verifier$' "$HOME/.gemini/config/agents/verifier/agent.md" 2>/dev/null \
+    && grep -q '^subagent: true$' "$HOME/.gemini/config/agents/verifier/agent.md" 2>/dev/null \
+    && pass 'verifier subagent installed for Antigravity' || fail 'verifier subagent installed for Antigravity'
+fi
 
 # ---- MCP servers ---------------------------------------------------------------------------
 while IFS=$'\t' read -r server url; do
@@ -108,6 +135,10 @@ while IFS=$'\t' read -r server url; do
   if has_cursor; then
     jq -e --arg n "$server" --arg u "$url" '.mcpServers[$n].url == $u' "$HOME/.cursor/mcp.json" >/dev/null 2>&1 \
       && pass "MCP $server registered in Cursor" || fail "MCP $server registered in Cursor"
+  fi
+  if has_agy; then
+    jq -e --arg n "$server" --arg u "$url" '.mcpServers[$n].serverUrl == $u or .mcpServers[$n].url == $u' "$HOME/.gemini/config/mcp_config.json" >/dev/null 2>&1 \
+      && pass "MCP $server registered in Antigravity" || fail "MCP $server registered in Antigravity"
   fi
 done < <(jq -r '.servers | to_entries[] | "\(.key)\t\(.value.url)"' "$ROOT/mcp.json")
 

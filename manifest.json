@@ -129,7 +129,7 @@
     {
       "name": "starter-kit",
       "source": "local",
-      "treeSha256": "b6d94cfecfd845e8ef0544495e5c48f9df2d9842530c9dbd69cdcb33c5c5801b",
+      "treeSha256": "06bea3d1900c9fb1674d0222b9353ce518f510c56f0e71a064e1f810537ddaae",
       "installPath": "~/.agents/skills/starter-kit"
     },
     {

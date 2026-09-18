@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # agent-harness guard: destructive or outward-facing shell commands wait for explicit confirmation.
 #
-# Registered as a PreToolUse (Claude Code, Codex) or beforeShellExecution (Cursor) hook. Reads the
+# Registered as a PreToolUse (Claude Code, Codex, Antigravity) or beforeShellExecution (Cursor) hook. Reads the
 # hook payload on stdin, and when the command matches a guarded pattern answers "ask" (Claude Code,
-# Cursor) or "deny" (Codex, which does not support "ask" yet). A command prefixed with CONFIRMED=1
+# Cursor, Antigravity) or "deny" (Codex, which does not support "ask" yet). A command prefixed with CONFIRMED=1
 # is allowed through, which is how the agent re-runs a command after the user confirmed it.
 #
 # Usage: guard-destructive.sh [--decision ask|deny]
@@ -20,10 +20,15 @@ done
 command -v jq >/dev/null 2>&1 || exit 0
 payload=$(cat)
 event=$(printf '%s' "$payload" | jq -r '.hook_event_name // ""')
-cmd=$(printf '%s' "$payload" | jq -r '.tool_input.command // .command // ""')
+cmd=$(printf '%s' "$payload" | jq -r '.tool_input.command // .command // .toolCall.args.CommandLine // ""')
+is_agy=$(printf '%s' "$payload" | jq -r 'if .toolCall != null then "1" else "" end')
 
 allow() {
-  if [ "$event" = beforeShellExecution ]; then printf '{"permission":"allow"}\n'; fi
+  if [ "$event" = beforeShellExecution ]; then
+    printf '{"permission":"allow"}\n'
+  elif [ -n "$is_agy" ]; then
+    printf '{"decision":"allow"}\n'
+  fi
   exit 0
 }
 
@@ -66,6 +71,8 @@ reason="agent-harness guard: this command is destructive or changes state outsid
 
 if [ "$event" = beforeShellExecution ]; then
   jq -nc --arg d "$decision" --arg r "$reason" '{permission:$d, user_message:"agent-harness guard: destructive or outward-facing command", agent_message:$r}'
+elif [ -n "$is_agy" ]; then
+  jq -nc --arg d "$decision" --arg r "$reason" '{decision:$d, reason:$r}'
 else
   jq -nc --arg d "$decision" --arg r "$reason" '{hookSpecificOutput:{hookEventName:"PreToolUse", permissionDecision:$d, permissionDecisionReason:$r}}'
 fi

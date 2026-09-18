@@ -15,9 +15,15 @@ done
 command -v sha256sum >/dev/null || command -v shasum >/dev/null || { echo "missing dependency: sha256sum or shasum" >&2; exit 1; }
 
 has_cursor() { [[ -d "$HOME/.cursor" ]] || command -v cursor-agent >/dev/null 2>&1; }
+has_agy() { [[ -d "$HOME/.gemini" ]] || command -v agy >/dev/null 2>&1; }
 
+[[ -L "$HOME/.claude/skills" ]] && rm -f "$HOME/.claude/skills"
 mkdir -p "$BACKUP/files" "$HOME/.agents/skills" "$HOME/.agents/hooks" "$HOME/.claude/skills" \
   "$HOME/.claude/agents" "$HOME/.codex/agents"
+if has_agy; then
+  [[ -L "$HOME/.gemini/config/skills" ]] && rm -f "$HOME/.gemini/config/skills"
+  mkdir -p "$HOME/.gemini/config/skills" "$HOME/.gemini/config/rules" "$HOME/.gemini/config/agents/verifier"
+fi
 : >"$TARGETS"
 
 backup_target() {
@@ -65,6 +71,15 @@ if has_cursor; then
   backup_target "$HOME/.cursor/hooks.json"
   backup_target "$HOME/.cursor/mcp.json"
 fi
+if has_agy; then
+  backup_target "$HOME/.gemini/config/rules/AGENTS.md"
+  backup_target "$HOME/.gemini/config/hooks.json"
+  backup_target "$HOME/.gemini/config/mcp_config.json"
+  backup_target "$HOME/.gemini/config/agents/verifier/agent.md"
+  for name in "${SKILLS[@]}"; do
+    backup_target "$HOME/.gemini/config/skills/$name"
+  done
+fi
 
 for name in "${SKILLS[@]}"; do
   [[ -f "$ROOT/skills/shared/$name/SKILL.md" ]] || { echo "missing vendored skill: $name" >&2; exit 1; }
@@ -78,6 +93,11 @@ rm -rf -- "$HOME/.codex/AGENTS.md"
 ln -s "$HOME/.agents/AGENTS.md" "$HOME/.codex/AGENTS.md"
 rm -rf -- "$HOME/.claude/CLAUDE.md"
 ln -s "$HOME/.agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+if has_agy; then
+  mkdir -p "$HOME/.gemini/config/rules"
+  rm -rf -- "$HOME/.gemini/config/rules/AGENTS.md"
+  ln -s "$HOME/.agents/AGENTS.md" "$HOME/.gemini/config/rules/AGENTS.md"
+fi
 
 # ---- skills ---------------------------------------------------------------------------------
 for name in "${SKILLS[@]}"; do
@@ -87,6 +107,11 @@ for name in "${SKILLS[@]}"; do
   cp -a "$ROOT/skills/shared/$name" "$canonical"
   rm -rf -- "$claude_link"
   ln -s "$canonical" "$claude_link"
+  if has_agy; then
+    agy_link="$HOME/.gemini/config/skills/$name"
+    rm -rf -- "$agy_link"
+    ln -s "$canonical" "$agy_link"
+  fi
 done
 
 prune_unmanaged() {
@@ -95,6 +120,7 @@ prune_unmanaged() {
   for entry in "$dir"/*; do
     [[ -e "$entry" || -L "$entry" ]] || continue
     name=${entry##*/}
+    [[ "$dir" == "$HOME/.claude/skills" && "$name" == "synced" ]] && continue
     is_managed "$name" && continue
     backup_target "$entry"
     rm -rf -- "$entry"
@@ -104,6 +130,9 @@ prune_unmanaged() {
 
 prune_unmanaged "$HOME/.agents/skills"
 prune_unmanaged "$HOME/.claude/skills"
+if has_agy; then
+  prune_unmanaged "$HOME/.gemini/config/skills"
+fi
 
 # ---- destructive-command guard hook --------------------------------------------------------
 install -m 0755 "$ROOT/hooks/guard-destructive.sh" "$HOOK"
@@ -142,6 +171,25 @@ if has_cursor; then
     ] + [{command:$command, timeout:10}])
   ' "$HOME/.cursor/hooks.json" | write_json "$HOME/.cursor/hooks.json"
 fi
+if has_agy; then
+  mkdir -p "$HOME/.gemini/config"
+  [[ -f "$HOME/.gemini/config/hooks.json" ]] || printf '{}\n' >"$HOME/.gemini/config/hooks.json"
+  jq --arg command "$HOOK --decision ask" '
+    .["guard-destructive"] = {
+      "PreToolUse": [
+        {
+          "matcher": "run_command",
+          "hooks": [
+            {
+              "type": "command",
+              "command": $command
+            }
+          ]
+        }
+      ]
+    }
+  ' "$HOME/.gemini/config/hooks.json" | write_json "$HOME/.gemini/config/hooks.json"
+fi
 
 # ---- verifier subagent ---------------------------------------------------------------------
 # Claude Code and Cursor read the markdown definition; Codex needs a TOML rendering of it.
@@ -156,6 +204,18 @@ case "$agent_desc$agent_body" in *"'''"*) echo "verifier.md must not contain thr
   printf 'sandbox_mode = "read-only"\n'
   printf "developer_instructions = '''\n%s\n'''\n" "$agent_body"
 } >"$HOME/.codex/agents/verifier.toml"
+if has_agy; then
+  mkdir -p "$HOME/.gemini/config/agents/verifier"
+  {
+    printf -- '---\n'
+    printf 'name: %s\n' "$agent_name"
+    printf 'description: %s\n' "$agent_desc"
+    printf 'subagent: true\n'
+    printf -- '---\n\n'
+    printf '# %s\n\n' "$(tr '[:lower:]' '[:upper:]' <<<"${agent_name:0:1}")${agent_name:1}"
+    printf '%s\n' "$agent_body"
+  } >"$HOME/.gemini/config/agents/verifier/agent.md"
+fi
 
 # ---- MCP servers ---------------------------------------------------------------------------
 while IFS=$'\t' read -r server url; do
@@ -173,6 +233,16 @@ while IFS=$'\t' read -r server url; do
     [[ -f "$HOME/.cursor/mcp.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.cursor/mcp.json"
     jq --arg name "$server" --arg url "$url" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = {url:$url}' \
       "$HOME/.cursor/mcp.json" | write_json "$HOME/.cursor/mcp.json"
+  fi
+  if has_agy; then
+    if command -v agy >/dev/null 2>&1; then
+      agy mcp add "$server" "$url" >/dev/null 2>&1 || true
+    else
+      mkdir -p "$HOME/.gemini/config"
+      [[ -f "$HOME/.gemini/config/mcp_config.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.gemini/config/mcp_config.json"
+      jq --arg name "$server" --arg url "$url" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = {disabled: false, serverUrl: $url}' \
+        "$HOME/.gemini/config/mcp_config.json" | write_json "$HOME/.gemini/config/mcp_config.json"
+    fi
   fi
 done < <(jq -r '.servers | to_entries[] | "\(.key)\t\(.value.url)"' "$ROOT/mcp.json")
 
