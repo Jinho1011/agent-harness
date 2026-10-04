@@ -179,6 +179,7 @@ machines where Cursor is installed.
 | `research` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `resolving-merge-conflicts` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `setup-matt-pocock-skills` | [mattpocock/skills](https://github.com/mattpocock/skills) |
+| `starter-kit` | authored here |
 | `tdd` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `teach` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `to-spec` | [mattpocock/skills](https://github.com/mattpocock/skills) |
