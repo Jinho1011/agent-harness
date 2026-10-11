@@ -140,6 +140,13 @@
       "installPath": "~/.agents/skills/resolving-merge-conflicts"
     },
     {
+      "name": "reverse-engineer-anything",
+      "source": "https://github.com/morluto/rea",
+      "sourceRevision": "a56f7bb668ab23fec8d33f7af353ac7ed2fe1895",
+      "treeSha256": "c21a967807e4301ef2bcbef958307a14b2d10ff1ec9ddd96143f2eaa1eea1dba",
+      "installPath": "~/.agents/skills/reverse-engineer-anything"
+    },
+    {
       "name": "setup-matt-pocock-skills",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",

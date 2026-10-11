@@ -1,0 +1,3 @@
+interface:
+  display_name: "Reverse Engineer Anything"
+  short_description: "Investigate binaries, apps, and websites with the REA MCP server"
