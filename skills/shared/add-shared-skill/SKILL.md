@@ -7,8 +7,9 @@ description: Add or remove an agent skill so Claude Code, Codex, and Cursor all 
 
 Skills are managed **only** through the agent-harness repository (the clone's `origin` remote,
 `git remote get-url origin`). Never create or delete a directory under `~/.claude/skills/`
-or `~/.agents/skills/` by hand â€” `install.sh` prunes anything the manifest does not list, so a
-hand-installed skill disappears on the next deploy.
+or `~/.agents/skills/` by hand for harness-managed skills. The installer preserves unrelated
+personal skills; it removes only names recorded in the previous successful install manifest
+that are no longer in the current manifest.
 
 The clone lives wherever it was checked out on this machine. `install.sh` records that path:
 
@@ -75,8 +76,9 @@ Keep `.skills[]` sorted by name. A skill you authored yourself has no upstream â
 
 ```bash
 ./scripts/sync-manifest.sh    # recomputes every treeSha256
+./scripts/install.sh --dry-run # review writes and removals without changing files
 ./scripts/install.sh
-./scripts/doctor.sh
+./scripts/doctor.sh --offline # local checks without starting agent CLIs
 ```
 
 `doctor.sh` must end with `All harness checks passed`. It checks the new skill three ways:
@@ -117,6 +119,10 @@ the clone's `origin` at it, or keep the skill project-local under `.agents/skill
 
 ## Gotchas
 
+- On the first upgrade from a version without `installed-manifest.json`, no old skill ownership
+  is inferred and no unlisted skill is pruned. Later installs use the recorded ownership list.
+- Manual-only skills may be absent from the automatic catalog. Check the installed directory,
+  Claude symlink, and invocation policy before reporting a skill missing.
 - **`install.sh` replaces `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` with symlinks** to
   `~/.agents/AGENTS.md`, which is copied from the repo. A local edit to any of them is lost on the
   next install. Edit `AGENTS.md` in the repo and commit instead.

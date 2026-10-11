@@ -1,0 +1,3 @@
+interface:
+  display_name: "HTML Report"
+  short_description: "Generate executive-ready, interactive single-file HTML reports and publish to file-shelf"

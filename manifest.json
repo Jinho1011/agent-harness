@@ -4,7 +4,7 @@
     {
       "name": "add-shared-skill",
       "source": "local",
-      "treeSha256": "06d6d7ddbd6d0cfb2d940c14005b425128ef0dc159c15094403134d4725b8b60",
+      "treeSha256": "5dd2085e4f60b8645f829ed56956f121b6f67d880643c7340d90504949f879d3",
       "installPath": "~/.agents/skills/add-shared-skill"
     },
     {
@@ -18,7 +18,7 @@
       "name": "code-review",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "ff7f0ba47f3bc7d2e4ecc5468946162bcfdd745a208c9e2289e2f15985abea2b",
+      "treeSha256": "818676860f2c89deb3047c8102d6b668aafe2b17e51a976a52618b245f039f3b",
       "installPath": "~/.agents/skills/code-review"
     },
     {
@@ -74,8 +74,14 @@
       "name": "handoff",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "737d1e246e97c7138644167471256245e3482ddecad1a85ce2822de777077e25",
+      "treeSha256": "41d867c4ee2af4e11232656f4375d55d3be04d66dcc95f0c63cfebac9dc50f2d",
       "installPath": "~/.agents/skills/handoff"
+    },
+    {
+      "name": "html-report",
+      "source": "local",
+      "treeSha256": "af1cc7d3abd2719b680547d46d9ab632d97663f8d413bd4390c25f344278bf59",
+      "installPath": "~/.agents/skills/html-report"
     },
     {
       "name": "implement",
@@ -92,10 +98,24 @@
       "installPath": "~/.agents/skills/improve-codebase-architecture"
     },
     {
+      "name": "orca-cli",
+      "source": "https://github.com/stablyai/orca",
+      "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
+      "treeSha256": "2edff6af6fac216a2d6ff7f5a5575bfa59332ba5a7236e68f19225a9121479db",
+      "installPath": "~/.agents/skills/orca-cli"
+    },
+    {
+      "name": "orchestration",
+      "source": "https://github.com/stablyai/orca",
+      "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
+      "treeSha256": "3f6abcf68d8df39f7b66ca06e3f045b214df2e5b0b467b07f11c07b5359981d2",
+      "installPath": "~/.agents/skills/orchestration"
+    },
+    {
       "name": "ponytail",
       "source": "https://github.com/DietrichGebert/ponytail",
       "sourceRevision": "2ed6c52c9d7e5e56942508591085fd45dea277d3",
-      "treeSha256": "8380b6d4824a260104299faf761bddef48db00a28bb9791654bc1c6f00abc018",
+      "treeSha256": "668292eb262764fdd17ef7096e5af0d9a5035c6fef5b95abc648a86a37d9dc2f",
       "installPath": "~/.agents/skills/ponytail"
     },
     {
@@ -166,6 +186,12 @@
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
       "treeSha256": "9d2e7e385dd30c089031869646c02b01b8528654d41100e7591f8db3949ba6d8",
       "installPath": "~/.agents/skills/triage"
+    },
+    {
+      "name": "ubuntu-ops",
+      "source": "local",
+      "treeSha256": "443d1c6396ec90ee495a1ba8df9c028e0c44e1c1723f9f786eca8436eb13af1a",
+      "installPath": "~/.agents/skills/ubuntu-ops"
     },
     {
       "name": "wayfinder",

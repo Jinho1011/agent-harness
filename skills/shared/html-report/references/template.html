@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>보고서 표준 템플릿 | Executive HTML Report</title>
+  
+  <!-- Pretendard Web Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Alpine.js (Lightweight Reactivity) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+
+  <!-- Apache ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+  <!-- Mermaid.js ESM -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    window.mermaid = mermaid;
+    mermaid.initialize({ 
+      startOnLoad: true, 
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#090d16',
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#475569',
+        lineColor: '#64748b'
+      }
+    });
+  </script>
+
+  <style>
+    html { scroll-padding-top: 6rem; }
+    details summary { flex-wrap: wrap; gap: 0.5rem; overflow-wrap: anywhere; }
+    details summary::-webkit-details-marker { display: none; }
+    
+    @media print {
+      .tab-content { display: block !important; margin-bottom: 2rem; }
+      .no-print { display: none !important; }
+      body { background-color: #ffffff !important; color: #0f172a !important; }
+      .print-card { background-color: #ffffff !important; border: 1px solid #e2e8f0 !important; color: #0f172a !important; box-shadow: none !important; page-break-inside: avoid; }
+      details { display: block !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen antialiased selection:bg-slate-700 selection:text-white pb-16 transition-colors duration-150"
+      x-data="reportApp()" x-init="initApp()">
+
+  <!-- Minimal Header -->
+  <header class="border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <span class="w-6 h-6 rounded bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs flex items-center justify-center">R</span>
+        <span class="font-bold text-slate-900 dark:text-slate-100 text-sm tracking-tight">Executive Report</span>
+        <span class="text-xs text-slate-400 dark:text-slate-500 hidden sm:inline">| Standard Template</span>
+      </div>
+
+      <div class="flex items-center space-x-2 no-print">
+        <button @click="toggleTheme()" 
+                class="px-2.5 py-1 rounded text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5">
+          <i :data-lucide="darkMode ? 'sun' : 'moon'" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline" x-text="darkMode ? '라이트' : '다크'"></span>
+        </button>
+
+        <button onclick="window.print()" class="px-2.5 py-1 rounded text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">인쇄</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
+
+    <!-- Title Section -->
+    <section class="space-y-1">
+      <div class="flex items-center gap-2 text-xs font-mono text-slate-400 dark:text-slate-500">
+        <span>작성일: 2026-10-05</span>
+        <span>•</span>
+        <span>에이전트: Antigravity (agy)</span>
+      </div>
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+        보고서 제목을 입력하세요
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+        보고서의 목적과 주요 결론을 요약한 한 줄 설명
+      </p>
+    </section>
+
+    <!-- Tab Navigation (Monochrome) -->
+    <div class="border-b border-slate-200 dark:border-slate-800 no-print">
+      <nav class="flex space-x-2 text-xs font-semibold overflow-x-auto no-scrollbar">
+        <button @click="switchMainTab('summary')" 
+                :class="currentMainTab === 'summary' 
+                  ? 'border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 pb-2.5 px-3' 
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 pb-2.5 px-3 transition'">
+          1. 요약 및 권장 행동
+        </button>
+        <button @click="switchMainTab('workflow')" 
+                :class="currentMainTab === 'workflow' 
+                  ? 'border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 pb-2.5 px-3' 
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 pb-2.5 px-3 transition'">
+          2. 프로세스 & 구조
+        </button>
+        <button @click="switchMainTab('metrics')" 
+                :class="currentMainTab === 'metrics' 
+                  ? 'border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 pb-2.5 px-3' 
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 pb-2.5 px-3 transition'">
+          3. 세부 지표 & 차트
+        </button>
+        <button @click="switchMainTab('evidence')" 
+                :class="currentMainTab === 'evidence' 
+                  ? 'border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 pb-2.5 px-3' 
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 pb-2.5 px-3 transition'">
+          4. 근거 및 감사 로그
+        </button>
+      </nav>
+    </div>
+
+    <!-- TAB 1: Summary & Checklist -->
+    <div x-show="currentMainTab === 'summary'" class="tab-content space-y-6">
+      <!-- 3-sentence summary -->
+      <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-3">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">핵심 결론 (Executive Summary)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+          <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800">
+            <span class="font-bold text-slate-900 dark:text-slate-100 block mb-1">핵심 요약 1</span>
+            시스템의 가장 중요한 상태 또는 결론을 1~2줄로 설명합니다.
+          </div>
+          <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800">
+            <span class="font-bold text-slate-900 dark:text-slate-100 block mb-1">핵심 요약 2</span>
+            측정된 핵심 지표 또는 리스크 요인을 명확히 전달합니다.
+          </div>
+          <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800">
+            <span class="font-bold text-slate-900 dark:text-slate-100 block mb-1">핵심 요약 3</span>
+            의사결정권자가 취해야 할 즉시 조치를 요약합니다.
+          </div>
+        </div>
+      </section>
+
+      <!-- KPI Grid -->
+      <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <span class="text-xs text-slate-400">전체 테스트</span>
+          <div class="mt-2 text-xl font-bold font-mono text-slate-900 dark:text-slate-100">128건</div>
+          <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">100% 통과</span>
+        </div>
+        <div class="p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <span class="text-xs text-slate-400">응답 속도 (p95)</span>
+          <div class="mt-2 text-xl font-bold font-mono text-slate-900 dark:text-slate-100">42ms</div>
+          <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">-18% 개선</span>
+        </div>
+        <div class="p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <span class="text-xs text-slate-400">코드 변경량</span>
+          <div class="mt-2 text-xl font-bold font-mono text-slate-900 dark:text-slate-100">+342 / -89</div>
+          <span class="text-[11px] text-slate-400 font-medium">8개 파일</span>
+        </div>
+        <div class="p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <span class="text-xs text-slate-400">위험 상태</span>
+          <div class="mt-2 text-xl font-bold font-mono text-slate-900 dark:text-slate-100">0건</div>
+          <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">정상 상태</span>
+        </div>
+      </section>
+
+      <!-- Checklist -->
+      <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-3">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">권장 조치 사항</h2>
+        <div class="space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+          <div class="flex items-start gap-2.5 p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+            <span class="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
+            <div><strong class="text-slate-900 dark:text-slate-100 block">조치 사항 1</strong> 세부 실행 지침을 기술합니다.</div>
+          </div>
+          <div class="flex items-start gap-2.5 p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+            <span class="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
+            <div><strong class="text-slate-900 dark:text-slate-100 block">조치 사항 2</strong> 세부 실행 지침을 기술합니다.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB 2: Process & Mermaid -->
+    <div x-show="currentMainTab === 'workflow'" style="display: none;" class="tab-content space-y-6">
+      <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-4">
+        <h2 class="text-sm font-bold text-slate-900 dark:text-slate-100">시스템 프로세스 흐름도</h2>
+        <div class="overflow-x-auto py-2">
+          <pre class="mermaid text-center">
+flowchart LR
+    A[입력 수집] --> B[분석 및 검증]
+    B --> C[아티팩트 생성]
+    C --> D[file-shelf 배포]
+    classDef default fill:#0f172a,stroke:#334155,color:#f8fafc;
+          </pre>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB 3: Metrics & Charts -->
+    <div x-show="currentMainTab === 'metrics'" style="display: none;" class="tab-content space-y-6">
+      <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-4">
+        <h2 class="text-sm font-bold text-slate-900 dark:text-slate-100">성능 벤치마크 추이</h2>
+        <div id="chart-metrics" style="height: 280px; width: 100%;"></div>
+      </section>
+    </div>
+
+    <!-- TAB 4: Evidence -->
+    <div x-show="currentMainTab === 'evidence'" style="display: none;" class="tab-content space-y-4">
+      <h2 class="text-sm font-bold text-slate-900 dark:text-slate-100">기술 구현 근거</h2>
+      <details class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3.5 text-xs">
+        <summary class="font-semibold text-slate-800 dark:text-slate-200 cursor-pointer flex justify-between">
+          <span>근거 항목 1</span>
+          <span class="font-mono text-slate-400 text-[11px]">src/core.py</span>
+        </summary>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+          상세 코드 발췌 및 설명
+        </div>
+      </details>
+    </div>
+
+  </main>
+
+  <script>
+    let metricsChart = null;
+
+    function reportApp() {
+      return {
+        darkMode: true,
+        currentMainTab: 'summary',
+
+        initApp() {
+          const savedTheme = localStorage.getItem('report_theme');
+          this.darkMode = savedTheme ? savedTheme === 'dark' : true;
+          this.applyTheme();
+          window.addEventListener('resize', () => { if (metricsChart) metricsChart.resize(); });
+          this.$nextTick(() => {
+            if (this.currentMainTab === 'metrics') initChart(this.darkMode);
+            if (window.lucide) window.lucide.createIcons();
+          });
+        },
+
+        switchMainTab(tab) {
+          this.currentMainTab = tab;
+          this.$nextTick(() => {
+            if (tab === 'metrics') {
+              setTimeout(() => {
+                if (!metricsChart) initChart(this.darkMode);
+                if (metricsChart) metricsChart.resize();
+              }, 40);
+            }
+            if (tab === 'workflow') {
+              setTimeout(() => {
+                if (window.mermaid) {
+                  try { window.mermaid.run(); } catch (e) {}
+                }
+              }, 40);
+            }
+            if (window.lucide) window.lucide.createIcons();
+          });
+        },
+
+        toggleTheme() {
+          this.darkMode = !this.darkMode;
+          localStorage.setItem('report_theme', this.darkMode ? 'dark' : 'light');
+          this.applyTheme();
+          this.$nextTick(() => {
+            if (metricsChart) { metricsChart.dispose(); metricsChart = null; }
+            initChart(this.darkMode);
+            if (window.lucide) window.lucide.createIcons();
+          });
+        },
+
+        applyTheme() {
+          if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+      };
+    }
+
+    function initChart(isDark) {
+      const el = document.getElementById('chart-metrics');
+      if (!el || !window.echarts) return;
+      metricsChart = echarts.init(el, isDark ? 'dark' : undefined, { renderer: 'svg' });
+      metricsChart.setOption({
+        backgroundColor: 'transparent',
+        grid: { left: '3%', right: '4%', bottom: '8%', top: '15%', containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: ['1차', '2차', '3차', '최종'],
+          axisLine: { lineStyle: { color: isDark ? '#334155' : '#cbd5e1' } }
+        },
+        yAxis: {
+          type: 'value',
+          splitLine: { lineStyle: { color: isDark ? '#1e293b' : '#f1f5f9' } }
+        },
+        series: [{
+          data: [80, 65, 52, 42],
+          type: 'line',
+          smooth: true,
+          itemStyle: { color: '#64748b' }
+        }]
+      });
+      window.addEventListener('resize', () => { if (metricsChart) metricsChart.resize(); });
+    }
+  </script>
+</body>
+</html>

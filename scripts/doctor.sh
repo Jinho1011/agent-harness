@@ -5,6 +5,13 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 MANIFEST="$ROOT/manifest.json"
 HOOK="$HOME/.agents/hooks/guard-destructive.sh"
 failures=0
+OFFLINE=false
+case "${1:-}" in
+  --offline) OFFLINE=true ;;
+  '') ;;
+  *) echo 'usage: doctor.sh [--offline]' >&2; exit 1 ;;
+esac
+[[ $# -le 1 ]] || { echo 'usage: doctor.sh [--offline]' >&2; exit 1; }
 
 pass() { printf 'PASS  %s\n' "$1"; }
 fail() { printf 'FAIL  %s\n' "$1" >&2; failures=$((failures + 1)); }
@@ -40,7 +47,7 @@ unmanaged=$(comm -23 \
   <(find "$HOME/.agents/skills" "$HOME/.claude/skills" "${agy_skills[@]}" -mindepth 1 -maxdepth 1 2>/dev/null | sed 's|.*/||' | grep -v '^synced$' | LC_ALL=C sort -u) \
   <(printf '%s\n' "$SKILL_LIST"))
 if [[ -n "$unmanaged" ]]; then
-  fail "no unmanaged skills installed (found: $(tr '\n' ' ' <<<"$unmanaged"))"
+  printf 'INFO  unmanaged skills preserved: %s\n' "$(tr '\n' ' ' <<<"$unmanaged")"
 else
   pass 'no unmanaged skills installed'
 fi
@@ -67,6 +74,9 @@ for link in "$HOME/.codex/AGENTS.md" "$HOME/.claude/CLAUDE.md"; do
     && pass "${link#"$HOME/"} links to the shared AGENTS.md" || fail "${link#"$HOME/"} links to the shared AGENTS.md"
 done
 if has_agy; then
+  gemini_rule="$HOME/.gemini/GEMINI.md"
+  [[ -L "$gemini_rule" && "$(readlink "$gemini_rule")" == "$shared" ]] \
+    && pass "${gemini_rule#"$HOME/"} links to the shared AGENTS.md" || fail "${gemini_rule#"$HOME/"} links to the shared AGENTS.md"
   agy_rule="$HOME/.gemini/config/rules/AGENTS.md"
   [[ -L "$agy_rule" && "$(readlink "$agy_rule")" == "$shared" ]] \
     && pass "${agy_rule#"$HOME/"} links to the shared AGENTS.md" || fail "${agy_rule#"$HOME/"} links to the shared AGENTS.md"
@@ -77,6 +87,12 @@ check 'shared instructions are portable' bash -c '! grep -Eq "/Users/|/home/" "$
 [[ -x "$HOOK" ]] && same_file "$HOOK" "$ROOT/hooks/guard-destructive.sh" \
   && pass 'guard hook installed and matches the repository' || fail 'guard hook installed and matches the repository'
 check 'guard hook is portable' bash -c '! grep -Eq "/Users/|/home/" "$1"' _ "$ROOT/hooks/guard-destructive.sh"
+check 'guard data helper matches the repository' same_file "$HOME/.agents/hooks/shell-data.py" "$ROOT/hooks/shell-data.py"
+if command -v shfmt >/dev/null 2>&1; then
+  pass 'shfmt available for literal data recognition'
+else
+  printf 'INFO  shfmt unavailable; guard uses conservative text matching\n'
+fi
 
 hook_out() { printf '%s' "$2" | "$HOOK" $1 2>/dev/null; }
 sample_force='{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git push --force origin main"}}'
@@ -125,9 +141,10 @@ if has_agy; then
 fi
 
 # ---- MCP servers ---------------------------------------------------------------------------
+check 'local configuration values and skill discovery' python3 "$ROOT/scripts/check-config.py"
 while IFS=$'\t' read -r server url; do
   [[ -n "$server" ]] || continue
-  if command -v claude >/dev/null 2>&1; then
+  if ! $OFFLINE && command -v claude >/dev/null 2>&1; then
     claude mcp get "$server" >/dev/null 2>&1 && pass "MCP $server registered in Claude Code" || fail "MCP $server registered in Claude Code"
   fi
   grep -q "^\[mcp_servers\.$server\]" "$HOME/.codex/config.toml" 2>/dev/null \

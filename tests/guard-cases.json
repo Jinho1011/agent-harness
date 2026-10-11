@@ -1,0 +1,21 @@
+[
+  {"name":"ordinary status","command":"git status","deny":false},
+  {"name":"force push","command":"git push --force origin main","deny":true},
+  {"name":"recursive removal","command":"rm -rf build","deny":true},
+  {"name":"compound execution","command":"printf done; git push --force origin main","deny":true},
+  {"name":"literal output","command":"printf '%s\\n' 'git push --force origin main'","deny":false,"parser_required":true},
+  {"name":"printf variable target can execute expansions","command":"printf -v 'a[$(git push --force origin main)]' '%s' data","deny":true},
+  {"name":"printf percent-n can assign","command":"printf '%n' 'a[$(git push --force origin main)]'","deny":true},
+  {"name":"literal search","command":"rg --no-config -- 'git push --force origin main' README.md","deny":false,"parser_required":true},
+  {"name":"literal grep","command":"grep -F -- 'terraform apply' README.md","deny":false,"parser_required":true},
+  {"name":"search preprocessor execution","command":"rg --pre 'git push --force origin main' needle README.md","deny":true},
+  {"name":"shell command string","command":"bash -c 'git push --force origin main'","deny":true},
+  {"name":"substitution","command":"printf '%s' \"$(git push --force origin main)\"","deny":true},
+  {"name":"pipeline","command":"printf '%s' 'git push --force origin main' | bash","deny":true},
+  {"name":"SQL execution","command":"psql -c 'DROP TABLE test'","deny":true},
+  {"name":"opaque Python data retained conservatively","command":"python3 - <<'PY'\nprint('git push --force origin main')\nPY","deny":true},
+  {"name":"Python execution","command":"python3 - <<'PY'\nimport os\nos.system('git push --force origin main')\nPY","deny":true},
+  {"name":"confirmation in data is not approval","command":"echo CONFIRMED=1 data; git push --force origin main","deny":true},
+  {"name":"approved command prefix","command":"CONFIRMED=1 git push --force origin main","deny":false},
+  {"name":"device redirect","command":"printf '%s' x >/dev/sda","deny":true}
+]

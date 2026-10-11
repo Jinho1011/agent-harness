@@ -8,8 +8,16 @@ STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 BACKUP="$STATE/backups/$STAMP"
 TARGETS="$BACKUP/targets.tsv"
 HOOK="$HOME/.agents/hooks/guard-destructive.sh"
+PREVIOUS="$STATE/installed-manifest.json"
+DRY_RUN=false
+case "${1:-}" in
+  --dry-run) DRY_RUN=true ;;
+  '') ;;
+  *) echo 'usage: install.sh [--dry-run]' >&2; exit 1 ;;
+esac
+[[ $# -le 1 ]] || { echo 'usage: install.sh [--dry-run]' >&2; exit 1; }
 
-for command_name in jq git; do
+for command_name in jq git python3; do
   command -v "$command_name" >/dev/null || { echo "missing dependency: $command_name" >&2; exit 1; }
 done
 command -v sha256sum >/dev/null || command -v shasum >/dev/null || { echo "missing dependency: sha256sum or shasum" >&2; exit 1; }
@@ -17,20 +25,20 @@ command -v sha256sum >/dev/null || command -v shasum >/dev/null || { echo "missi
 has_cursor() { [[ -d "$HOME/.cursor" ]] || command -v cursor-agent >/dev/null 2>&1; }
 has_agy() { [[ -d "$HOME/.gemini" ]] || command -v agy >/dev/null 2>&1; }
 
-[[ -L "$HOME/.claude/skills" ]] && rm -f "$HOME/.claude/skills"
-mkdir -p "$BACKUP/files" "$HOME/.agents/skills" "$HOME/.agents/hooks" "$HOME/.claude/skills" \
-  "$HOME/.claude/agents" "$HOME/.codex/agents"
-if has_agy; then
-  [[ -L "$HOME/.gemini/config/skills" ]] && rm -f "$HOME/.gemini/config/skills"
-  mkdir -p "$HOME/.gemini/config/skills" "$HOME/.gemini/config/rules" "$HOME/.gemini/config/agents/verifier"
-fi
-: >"$TARGETS"
-
 backup_target() {
   local target=$1 rel
   case "$target" in
     "$HOME"/*) rel=${target#"$HOME/"} ;;
     *) echo "refusing to back up path outside HOME: $target" >&2; exit 1 ;;
+  esac
+  if $DRY_RUN; then
+    printf 'WRITE (backup first) %s\n' "$target"
+    return
+  fi
+  # A backed-up directory symlink must never be traversed to write child backups.
+  case "$target" in
+    "$HOME/.claude/skills/"*) [[ -L "$HOME/.claude/skills" ]] && return ;;
+    "$HOME/.gemini/config/skills/"*) [[ -L "$HOME/.gemini/config/skills" ]] && return ;;
   esac
   if [[ -e "$target" || -L "$target" ]]; then
     mkdir -p "$BACKUP/files/$(dirname "$rel")"
@@ -52,17 +60,47 @@ fi
 
 SKILLS=()
 while IFS= read -r name; do SKILLS+=("$name"); done <<<"$SKILL_LIST"
+for name in "${SKILLS[@]}"; do
+  [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ && -f "$ROOT/skills/shared/$name/SKILL.md" ]] || { echo "invalid vendored skill: $name" >&2; exit 1; }
+done
+python3 "$ROOT/scripts/check-config.py" --source >/dev/null || {
+  echo 'source/configuration validation failed; run python3 scripts/check-config.py --source' >&2
+  exit 1
+}
+REMOVED=()
+if [[ -f "$PREVIOUS" ]]; then
+  previous_names=$(jq -er '.skills | map(.name) | .[]' "$PREVIOUS")
+  while IFS= read -r name; do
+    [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo 'invalid previous skill name' >&2; exit 1; }
+    if ! printf '%s\n' "$SKILL_LIST" | grep -Fxq -- "$name"; then REMOVED+=("$name"); fi
+  done <<<"$previous_names"
+fi
+
+if ! $DRY_RUN; then
+  mkdir -p "$STATE/backups"
+  BACKUP=$(mktemp -d "$STATE/backups/$STAMP.XXXXXX")
+  TARGETS="$BACKUP/targets.tsv"
+  mkdir -p "$BACKUP/files"
+  : >"$TARGETS"
+fi
 
 is_managed() {
   printf '%s\n' "$SKILL_LIST" | grep -Fxq -- "$1"
 }
 
 # ---- backups -------------------------------------------------------------------------------
+backup_target "$PREVIOUS"
+backup_target "$STATE/root"
+backup_target "$STATE/latest-backup"
+[[ -L "$HOME/.claude/skills" ]] && backup_target "$HOME/.claude/skills"
+if has_agy && [[ -L "$HOME/.gemini/config/skills" ]]; then backup_target "$HOME/.gemini/config/skills"; fi
 backup_target "$HOME/.agents/AGENTS.md"
 backup_target "$HOME/.codex/AGENTS.md"
 backup_target "$HOME/.claude/CLAUDE.md"
 backup_target "$HOOK"
+backup_target "$HOME/.agents/hooks/shell-data.py"
 backup_target "$HOME/.claude/settings.json"
+if command -v claude >/dev/null 2>&1; then backup_target "$HOME/.claude.json"; fi
 backup_target "$HOME/.codex/hooks.json"
 backup_target "$HOME/.codex/config.toml"
 backup_target "$HOME/.claude/agents/verifier.md"
@@ -72,6 +110,7 @@ if has_cursor; then
   backup_target "$HOME/.cursor/mcp.json"
 fi
 if has_agy; then
+  backup_target "$HOME/.gemini/GEMINI.md"
   backup_target "$HOME/.gemini/config/rules/AGENTS.md"
   backup_target "$HOME/.gemini/config/hooks.json"
   backup_target "$HOME/.gemini/config/mcp_config.json"
@@ -87,6 +126,49 @@ for name in "${SKILLS[@]}"; do
   backup_target "$HOME/.claude/skills/$name"
 done
 
+skill_dirs=("$HOME/.agents/skills" "$HOME/.claude/skills")
+if has_agy; then skill_dirs+=("$HOME/.gemini/config/skills"); fi
+for dir in "${skill_dirs[@]}"; do
+  for name in "${REMOVED[@]+"${REMOVED[@]}"}"; do
+    entry="$dir/$name"
+    [[ -e "$entry" || -L "$entry" ]] || continue
+    if $DRY_RUN; then printf 'REMOVE previously managed %s\n' "$entry"; else backup_target "$entry"; fi
+  done
+done
+
+if $DRY_RUN; then
+  for dir in "${skill_dirs[@]}"; do
+    for entry in "$dir"/*; do
+      [[ -e "$entry" || -L "$entry" ]] || continue
+      name=${entry##*/}
+      is_managed "$name" && continue
+      printf '%s\n' "${REMOVED[@]+"${REMOVED[@]}"}" | grep -Fxq -- "$name" || printf 'PRESERVE unmanaged %s\n' "$entry"
+    done
+  done
+  jq -r '.servers | to_entries[] | "MCP ensure \(.key) = \(.value.url) (no CLI executed)"' "$ROOT/mcp.json"
+  echo 'Dry run: no files changed or agent CLIs executed.'
+  exit 0
+fi
+
+# Preserve locally installed entries when migrating an old directory symlink.
+for dir in "$HOME/.claude/skills" "$HOME/.gemini/config/skills"; do
+  if [[ -L "$dir" ]]; then
+    source_dir=$(cd "$dir" && pwd -P)
+    rm -f "$dir"
+    mkdir -p "$dir"
+    # Keep each entry's original base directory, including relative personal symlinks.
+    for entry in "$source_dir"/* "$source_dir"/.[!.]* "$source_dir"/..?*; do
+      [[ -e "$entry" || -L "$entry" ]] || continue
+      ln -s "$entry" "$dir/${entry##*/}"
+    done
+  fi
+done
+mkdir -p "$HOME/.agents/skills" "$HOME/.agents/hooks" "$HOME/.claude/skills" \
+  "$HOME/.claude/agents" "$HOME/.codex/agents"
+if has_agy; then
+  mkdir -p "$HOME/.gemini/config/skills" "$HOME/.gemini/config/rules" "$HOME/.gemini/config/agents/verifier"
+fi
+
 # ---- shared instructions ------------------------------------------------------------------
 install -m 0644 "$ROOT/AGENTS.md" "$HOME/.agents/AGENTS.md"
 rm -rf -- "$HOME/.codex/AGENTS.md"
@@ -95,6 +177,7 @@ rm -rf -- "$HOME/.claude/CLAUDE.md"
 ln -s "$HOME/.agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
 if has_agy; then
   mkdir -p "$HOME/.gemini/config/rules"
+  ln -sfn "$HOME/.agents/AGENTS.md" "$HOME/.gemini/GEMINI.md"
   rm -rf -- "$HOME/.gemini/config/rules/AGENTS.md"
   ln -s "$HOME/.agents/AGENTS.md" "$HOME/.gemini/config/rules/AGENTS.md"
 fi
@@ -114,28 +197,18 @@ for name in "${SKILLS[@]}"; do
   fi
 done
 
-prune_unmanaged() {
-  local dir=$1 entry name
-  [[ -d "$dir" ]] || return 0
-  for entry in "$dir"/*; do
+for dir in "${skill_dirs[@]}"; do
+  for name in "${REMOVED[@]+"${REMOVED[@]}"}"; do
+    entry="$dir/$name"
     [[ -e "$entry" || -L "$entry" ]] || continue
-    name=${entry##*/}
-    [[ "$dir" == "$HOME/.claude/skills" && "$name" == "synced" ]] && continue
-    is_managed "$name" && continue
-    backup_target "$entry"
     rm -rf -- "$entry"
-    echo "pruned unmanaged skill: $entry"
+    echo "pruned previously managed skill: $entry"
   done
-}
-
-prune_unmanaged "$HOME/.agents/skills"
-prune_unmanaged "$HOME/.claude/skills"
-if has_agy; then
-  prune_unmanaged "$HOME/.gemini/config/skills"
-fi
+done
 
 # ---- destructive-command guard hook --------------------------------------------------------
 install -m 0755 "$ROOT/hooks/guard-destructive.sh" "$HOOK"
+install -m 0644 "$ROOT/hooks/shell-data.py" "$HOME/.agents/hooks/shell-data.py"
 
 write_json() {
   local file=$1 tmp
@@ -150,10 +223,15 @@ register_pretooluse() {
   [[ -f "$file" ]] || printf '{}\n' >"$file"
   jq --arg command "$HOOK --decision $decision" '
     .hooks = (.hooks // {}) |
+    (.hooks.PreToolUse // []) as $groups |
+    ([$groups | to_entries[] |
+      select([.value.hooks[]?.command // ""] | any(contains("guard-destructive.sh"))) |
+      .key][0] // ($groups | length)) as $slot |
     .hooks.PreToolUse = ([
-      (.hooks.PreToolUse // [])[] |
-      select(([.hooks[]?.command // ""] | any(contains("guard-destructive.sh"))) | not)
-    ] + [{matcher:"Bash", hooks:[{type:"command", command:$command}]}])
+      $groups[] |
+      .hooks = [.hooks[]? | select(((.command // "") | contains("guard-destructive.sh")) | not)] |
+      select(.hooks | length > 0)
+    ] | .[:$slot] + [{matcher:"Bash", hooks:[{type:"command", command:$command}]}] + .[$slot:])
   ' "$file" | write_json "$file"
 }
 register_pretooluse "$HOME/.claude/settings.json" ask
@@ -248,6 +326,7 @@ done < <(jq -r '.servers | to_entries[] | "\(.key)\t\(.value.url)"' "$ROOT/mcp.j
 
 printf '%s\n' "$BACKUP" >"$STATE/latest-backup"
 printf '%s\n' "$ROOT" >"$STATE/root"
+cp "$MANIFEST" "$PREVIOUS"
 echo "Installed shared harness. Backup: $BACKUP"
 echo "Run: $ROOT/scripts/doctor.sh"
 if command -v codex >/dev/null 2>&1; then

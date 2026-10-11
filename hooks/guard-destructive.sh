@@ -34,7 +34,7 @@ allow() {
 
 [ -n "$cmd" ] || allow
 case "$cmd" in
-  CONFIRMED=1\ *|*[[:space:]]CONFIRMED=1\ *) allow ;;
+  CONFIRMED=1\ *) allow ;;
 esac
 
 patterns=(
@@ -66,6 +66,13 @@ for p in "${patterns[@]}"; do
   if printf '%s' "$cmd" | grep -Eq "$p"; then hit=$p; break; fi
 done
 [ -n "$hit" ] || allow
+
+# Only proven literal output/search is exempt. Opaque interpreters and parse failures
+# retain the original conservative decision; this is a command guard, not a sandbox.
+helper="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/shell-data.py"
+if [[ -f "$helper" ]] && command -v python3 >/dev/null 2>&1 && command -v shfmt >/dev/null 2>&1; then
+  if printf '%s' "$cmd" | python3 "$helper"; then allow; fi
+fi
 
 reason="agent-harness guard: this command is destructive or changes state outside the working tree. Ask the user for explicit confirmation first; once they confirm, re-run it prefixed with CONFIRMED=1."
 

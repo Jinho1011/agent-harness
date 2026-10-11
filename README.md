@@ -9,8 +9,8 @@ destructive commands. Run it again after `git pull` to update; `doctor.sh` prove
 
 | Area | Installed to | Source in this repo |
 |---|---|---|
-| Shared instructions | `~/.agents/AGENTS.md`; `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.gemini/config/rules/AGENTS.md` are symlinks to it | `AGENTS.md` |
-| Shared skills (26) | `~/.agents/skills/<name>` (read by Codex and Cursor) + `~/.claude/skills/<name>` and `~/.gemini/config/skills/<name>` symlinks | `skills/shared/` |
+| Shared instructions | `~/.agents/AGENTS.md`; `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/GEMINI.md` (Gemini CLI), and `~/.gemini/config/rules/AGENTS.md` (AGY) are symlinks to it | `AGENTS.md` |
+| Shared skills (27) | `~/.agents/skills/<name>` (read by Codex and Cursor) + `~/.claude/skills/<name>` and `~/.gemini/config/skills/<name>` symlinks | `skills/shared/` |
 | Destructive-command guard hook | `~/.agents/hooks/guard-destructive.sh`, registered in `~/.claude/settings.json`, `~/.codex/hooks.json`, `~/.cursor/hooks.json`, `~/.gemini/config/hooks.json` | `hooks/` |
 | `verifier` subagent | `~/.claude/agents/verifier.md`; rendered to `~/.codex/agents/verifier.toml` and `~/.gemini/config/agents/verifier/agent.md` | `agents/` |
 | MCP servers | `claude mcp` user scope, `[mcp_servers.*]` in `~/.codex/config.toml`, `~/.cursor/mcp.json`, `~/.gemini/config/mcp_config.json` | `mcp.json` |
@@ -20,7 +20,8 @@ Everything is copied from this repository, backed up before it is replaced, and 
 
 ## Requirements
 
-- bash 3.2 or newer (the stock macOS bash works), `jq`, `git`, and `sha256sum` or `shasum`
+- bash 3.2 or newer (the stock macOS bash works), Python 3.11+, `jq`, `git`, and `sha256sum` or `shasum`
+- Optional: `shfmt` lets the guard recognize literal output/search data. Without it, matching stays conservative.
 - Linux or macOS, including WSL
 - Optional: the `claude`, `codex`, `cursor-agent`, and `agy` CLIs. Registration steps for an agent that is
   not installed are skipped.
@@ -32,13 +33,19 @@ Fork the repository if you want to change anything, then:
 ```bash
 git clone https://github.com/<you>/agent-harness ~/.config/agent-harness
 cd ~/.config/agent-harness
+./scripts/install.sh --dry-run
 ./scripts/install.sh
-./scripts/doctor.sh
+./scripts/doctor.sh --offline
 ```
 
 The clone can live anywhere; `install.sh` records its path in `~/.local/state/agent-harness/root`.
 Start new agent sessions afterwards. If you use Codex, run `/hooks` inside it once to trust the
 guard hook.
+
+`--dry-run` validates source checksums and configuration, then lists writes and removals without
+creating backups, changing files, or invoking agent CLIs. `doctor.sh --offline` checks local
+configuration values, skill discovery, HUD paths, and hook behavior without contacting MCP servers.
+Run `doctor.sh` without the flag when Claude CLI registration checks are also wanted.
 
 Update:
 
@@ -76,15 +83,23 @@ actually moves agent behavior.
 Cursor CLI reads project-level `AGENTS.md` and `CLAUDE.md` but has no file-based global
 instruction file; keep cross-project guidance for Cursor in the app's User Rules. Antigravity CLI (`agy`)
 reads `~/.gemini/config/rules/AGENTS.md` globally, as well as project-level `AGENTS.md` and `GEMINI.md`.
+Standalone Gemini CLI reads `~/.gemini/GEMINI.md`, linked to the same shared instructions.
+On machines with file-shelf installed, report HTML and its assets are copied into `$HOME/share`
+by default, and the final response includes a verified browser link.
 
 ### Skills
 
 `skills/shared/` is the single source of truth. `install.sh` copies each skill to
 `~/.agents/skills/<name>`, which Codex and Cursor read natively, and symlinks it into
 `~/.claude/skills/<name>` for Claude Code and `~/.gemini/config/skills/<name>` for Antigravity (`agy`).
-It prunes anything in either directory that `manifest.json` does not list, so a skill installed
-outside this repository disappears on the next install (it is backed up first). Every skill is
-pinned to an upstream commit and a tree checksum.
+It preserves unrelated personal skills. Only names in the previous successful installation's
+`~/.local/state/agent-harness/installed-manifest.json` that disappear from the current manifest
+are pruned, after backup. With no previous record, nothing is inferred or pruned. Skills have a
+tree checksum and either a pinned upstream source or a local origin.
+
+Manual-only skills remain installed and callable even when absent from the automatic catalog.
+`ponytail` now applies when requested for a task, rather than to every coding conversation.
+`ubuntu-ops` inspects agent CLI, OAuth, and service state and preserves local CLI setup.
 
 ### Guard hook
 
@@ -100,6 +115,13 @@ not support `ask` yet, and Cursor auto-allows `ask` under `--yolo` and in non-in
 so both get `deny` with a reason that tells the agent to get the user's confirmation. A command
 prefixed with `CONFIRMED=1` passes the guard, which is how an agent re-runs a command after the
 user said yes.
+
+With `shfmt`, standalone literal `echo`, `printf` with literal/`%s`/`%%` formats,
+`grep -F --`, and `rg --no-config --` calls
+can contain example commands without being blocked. Pipelines, substitutions, redirects,
+interpreters (including Python heredocs), SQL and parse failures retain conservative matching.
+Python test-data strings can therefore still cause false positives; keep regression inputs in
+fixture files. The guard is a command-pattern check, not a sandbox or an interpreter analyzer.
 
 `install.sh` merges its entry into each agent's hook file and leaves every other hook in place.
 Codex requires each machine to trust a hook once: run `/hooks` inside `codex` after installing.
@@ -152,8 +174,9 @@ machines where Cursor is installed.
 
 | Script | Purpose |
 |---|---|
-| `scripts/install.sh` | Install everything above; back up each target first; prune unmanaged skills |
-| `scripts/doctor.sh` | Verify the result: checksums, symlinks, hook behavior and registration, subagent files, MCP registration |
+| `scripts/install.sh [--dry-run]` | Preview or install; back up targets; prune only previously managed skills |
+| `scripts/doctor.sh [--offline]` | Verify checksums, discovery, symlinks, hooks, verifier contents, HUD paths and MCP values |
+| `scripts/check-config.py [--source]` | Validate source or installed configuration locally with Python 3.11+ |
 | `scripts/sync-manifest.sh` | Rebuild `manifest.json` skill entries and `treeSha256` from `skills/shared/` |
 | `scripts/restore.sh` | Roll back only the targets this repository manages |
 
@@ -185,10 +208,15 @@ machines where Cursor is installed.
 | `to-spec` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `to-tickets` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `triage` | [mattpocock/skills](https://github.com/mattpocock/skills) |
+| `ubuntu-ops` | authored here |
 | `wayfinder` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `writing-great-skills` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 
 Upstream licenses are reproduced in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+
+Run isolated install/restore and guard regressions with
+`PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v`.
+Tests use temporary homes and stub agent CLIs; they do not change the real installation.
 
 ## License
 

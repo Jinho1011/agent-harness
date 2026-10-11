@@ -3,33 +3,43 @@ name: code-review
 description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to "review since X".
 ---
 
-Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
+Two-axis review of the changes the user requests, including uncommitted work when requested:
 
 - **Standards** — does the code conform to this repo's documented coding standards?
 - **Spec** — does the code faithfully implement the originating issue / PRD / spec?
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-The issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if `docs/agents/issue-tracker.md` is missing.
+Use an existing issue-tracker configuration when needed; do not require tracker setup for a local review.
 
 ## Process
 
 ### 1. Pin the fixed point
 
-Whatever the user said is the fixed point — a commit SHA, branch name, tag, `main`, `HEAD~5`, etc. If they didn't specify one, ask for it.
+Choose the comparison from the user's scope:
 
-Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
+- For working-tree or WIP review, use `git diff HEAD` for staged and unstaged tracked changes,
+  plus `git ls-files --others --exclude-standard` and the relevant untracked file contents.
+  In a repository without HEAD, use `git diff --cached` plus `git diff` and the untracked files.
+- For a branch or PR, use `git diff <base>...HEAD` and `git log <base>..HEAD --oneline`.
+- For changes since an exact commit/tag, use `git diff <ref> HEAD`; use three-dot only when
+  the user asks for changes since the merge-base. If they also request WIP, compare the working
+  tree to that resolved base and include untracked files.
+- With no specified scope, use WIP if present. Otherwise discover the PR base or ask for the
+  baseline when it cannot be established. Do not ask for a commit just to review local edits.
 
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here — not inside two parallel sub-agents.
+Record the exact commands and resolved references for both reviewers. Validate references and
+check the complete scope, including untracked files, before declaring it empty or spawning agents.
 
 ### 2. Identify the spec source
 
 Look for the originating spec, in this order:
 
-1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the workflow in `docs/agents/issue-tracker.md`.
-2. A path the user passed as an argument.
+1. The user's current request, accepted plan, or spec path supplied for this review.
+2. Issue references in commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — use the available tracker workflow.
 3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
-4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
+4. If nothing is found, report "no spec available" and proceed with Standards. Ask only if a
+   missing requirement would materially change a finding; do not invent a spec or block the review.
 
 ### 3. Identify the standards sources
 

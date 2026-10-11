@@ -1,0 +1,3 @@
+interface:
+  display_name: "Orca Orchestration"
+  short_description: "Coordinate supervised Orca workers and task DAGs"

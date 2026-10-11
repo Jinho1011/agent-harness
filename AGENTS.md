@@ -36,6 +36,8 @@ works, style.
 - Write the least code that satisfies the request: an abstraction needs two call sites, and
   configurability or extra error paths need someone who asked for them.
 - Keep the user's uncommitted changes intact.
+- Continue reversible follow-up work within the scope already approved by the user without
+  asking for the same approval again. Ask when a new decision or scope change needs their input.
 
 ## When stuck
 
@@ -47,6 +49,11 @@ works, style.
 
 ## Context
 
+- Default to concise Korean: explain the result, reason, and next action in plain language,
+  unless the user requests another language. During long work, report what is done, what remains,
+  and what is blocked; do not wait for the user to ask for status.
+- For a simple status question, run the smallest direct check with a short timeout and answer
+  first. Do not expand it into repository discovery or delegate unrelated investigation.
 - Broad reading (repository discovery, long logs, multi-page docs, diff review) goes to a
   read-only subagent when one is available. Give it the relevant paths, keep decisions and edits in
   the main agent, and report on long-running delegated work without being asked.
@@ -57,6 +64,18 @@ works, style.
 
 - When the user corrects a behavior that will recur, propose the one-line rule for the project's
   AGENTS.md or CLAUDE.md so the correction survives this session.
+
+## HTML reports
+
+- When creating or updating a report HTML on a machine with
+  `$HOME/services/file-shelf/README.md`, publish it to `$HOME/share` by default as part of
+  completing the task, unless the user explicitly opts out. Keep the original artifact and copy
+  the HTML plus its required assets into a uniquely named report subdirectory with `index.html`;
+  preserve relative asset paths, avoid overwriting unrelated reports, and do not use symlinks.
+- Read the file-shelf README for the current base URL, check that the published report is served
+  successfully, and include its clickable URL in the final response. Keep the share root available
+  for the file listing; do not put an `index.html` there. If publishing or verification fails,
+  report the failure and original file path instead of claiming the report is available.
 
 ## Environment
 
