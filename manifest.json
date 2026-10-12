@@ -17,36 +17,36 @@
     {
       "name": "ask-matt",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "a8ee60528a0f891c8de32c22a32303b3c4d3aee02dee27054babb8f5f786eb53",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "63e66ad8367bf6c9908ab3c536929f32cab5e459699e72ea7ee2082e74bd2a1e",
       "installPath": "~/.agents/skills/ask-matt"
     },
     {
       "name": "code-review",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "818676860f2c89deb3047c8102d6b668aafe2b17e51a976a52618b245f039f3b",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "4bd98d948aa1d69b4e72db276ccac7c902187e03d59a6958705878a976154eaa",
       "installPath": "~/.agents/skills/code-review"
     },
     {
       "name": "codebase-design",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "0ec70338ca9d09c86795533fec33c4d724a31d9946327be3079d9197c5b66f9c",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "24ca44539eb30dea1a26465b024416c511f8046de7400addc0bfadd45273a067",
       "installPath": "~/.agents/skills/codebase-design"
     },
     {
       "name": "diagnosing-bugs",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "9f4d24bf00072b98ef62784fb7a53aeb65b84325b086300ac4d4e0ea0c70558f",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "d0a193ed9c0a64aa8266abbbbda37c88975a3835b9d00f5c989e37c77c92871c",
       "installPath": "~/.agents/skills/diagnosing-bugs"
     },
     {
       "name": "domain-modeling",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "c28987127c120992f1b1e11f0ea9ff000ac247e7ea4b78dbfd91528614f6cd5b",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "ef7dcc0750bce2be67b4a320858b2d7620649d351cbca3f3ddf8bfe349f77bce",
       "installPath": "~/.agents/skills/domain-modeling"
     },
     {
@@ -59,29 +59,29 @@
     {
       "name": "grill-me",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "25e44ab3b79fd77537b4d7c2c6f1006c0db14284e66fef1ffbd2ccffcec1e5ff",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "b31f9656e60cf9dd15b20ca3fdf5a900f343d5364d2840c9b139f79af69cabb8",
       "installPath": "~/.agents/skills/grill-me"
     },
     {
       "name": "grill-with-docs",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "94563e37cc3a0aa6e872e79e3060d4cc6ceb1a79e09e072defd27b9c33342eb3",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "84b20677d329c346c15023c4eb4bab1d1dc777d66ab4fcb962ce52ced253c301",
       "installPath": "~/.agents/skills/grill-with-docs"
     },
     {
       "name": "grilling",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "92256376549ff4c77216c2042a22b4e4bfeedbedc0d6c56c9054c0c1a34e84ab",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "5f9a70e4cb04c0f308ba3da4917a7d377142834fdf883bb49f4dfab5f6098b74",
       "installPath": "~/.agents/skills/grilling"
     },
     {
       "name": "handoff",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "41d867c4ee2af4e11232656f4375d55d3be04d66dcc95f0c63cfebac9dc50f2d",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "b18e27803864a87fb2b66b3651c226481d7617581311c888f809cf55e0d81a57",
       "installPath": "~/.agents/skills/handoff"
     },
     {
@@ -100,8 +100,8 @@
     {
       "name": "improve-codebase-architecture",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "8e221e8395819d4e431b6eb9a1cd02f5bf177272a703562efd3e757ed44b65ae",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "b1736ac87de7ad33d093eacdb13194357322fa1a8823d90bdf3c35d0100f7f03",
       "installPath": "~/.agents/skills/improve-codebase-architecture"
     },
     {
@@ -121,22 +121,22 @@
     {
       "name": "ponytail",
       "source": "https://github.com/DietrichGebert/ponytail",
-      "sourceRevision": "2ed6c52c9d7e5e56942508591085fd45dea277d3",
-      "treeSha256": "668292eb262764fdd17ef7096e5af0d9a5035c6fef5b95abc648a86a37d9dc2f",
+      "sourceRevision": "9cc65d03aa2da1db7121b912d03596409ee340b8",
+      "treeSha256": "1e88b02f0419bf88fdd1d17c89735cc17db167b8a14a7aa7ed7f017cfa2a1baa",
       "installPath": "~/.agents/skills/ponytail"
     },
     {
       "name": "prototype",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "d49e71f813e3484cb080f77afb6bd6f4dad1af67f95eab9938edc8e81a2250c5",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "b5e661746ab32d6ec8c1f6743399af598935c839979ab03c86efa3aa82ce8dfb",
       "installPath": "~/.agents/skills/prototype"
     },
     {
       "name": "research",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "ba31eb3a0b2965c1abb2793993d49230c96d142cbabbc30544fcdf75b0992f79",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "95b2d283ed0063f736db62e67392699a718036cbc30eacea1fe5a51cbe7e89b8",
       "installPath": "~/.agents/skills/research"
     },
     {
@@ -156,8 +156,8 @@
     {
       "name": "setup-matt-pocock-skills",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "c2d74e3ba2e6daa991047b1a41c55562be13b975ee9f390c6846c6c41ba2f686",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "7675b864dfab694f658c4e8da43d8f2ae6ee163af11c5e3cc873b577e9ca5e6c",
       "installPath": "~/.agents/skills/setup-matt-pocock-skills"
     },
     {
@@ -169,36 +169,36 @@
     {
       "name": "tdd",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "bade3a557be53ba8d9e0b3cb1825cc869d2adeb42d2837601d3ae6bef493cf93",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "7e147beeb2b096c4164228d60d5e8338cf0a2d880781e4568df8fefa3a10a9b9",
       "installPath": "~/.agents/skills/tdd"
     },
     {
       "name": "teach",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "4a291a12df450729f0d6417969aa439b335a89a3bf9f76d876eba1468b0af97f",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "25647609adbf3c8ce4a87e3f88d4ac63c75c862bd8fdcd9c7da3d23cd10035ae",
       "installPath": "~/.agents/skills/teach"
     },
     {
       "name": "to-spec",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "7c16656d37a1573f986b0876086fc022f86d5e848da930d2aeed47a42970a2e3",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "07dd565b1c4e95e7132bfd5a3436320dce0a6a46f167f76fd5674ba9da6f9192",
       "installPath": "~/.agents/skills/to-spec"
     },
     {
       "name": "to-tickets",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "35b5e5d296ae3fb2bffb0943a543461c29dddca3876231e395554052b82d1f52",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "820254fa9a8f36fb3018fa651d4d60a6eec385081a3bd07aecbb89d92d109c43",
       "installPath": "~/.agents/skills/to-tickets"
     },
     {
       "name": "triage",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "9d2e7e385dd30c089031869646c02b01b8528654d41100e7591f8db3949ba6d8",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "a699caccdf79880d5a8c5638734fd64443f931763c45c7fcb18b3bb6bca34c6c",
       "installPath": "~/.agents/skills/triage"
     },
     {
@@ -210,8 +210,8 @@
     {
       "name": "wayfinder",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "d07c9244434fd6b17a1b9b839b08e8ebec6056e6be5574b1ce1f38fc1db1d6a8",
+      "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "treeSha256": "782065efe35bcbe2a19ca0be30a26732af25d5076c9bc22beaab80ef8fde045c",
       "installPath": "~/.agents/skills/wayfinder"
     },
     {

@@ -19,7 +19,7 @@ Return a link to the document and a ready-to-paste prompt for the next session. 
 point to the document, state the goal and next action, and tell the next agent to preserve existing
 changes and approvals. An approval recorded in the document does not authorize unrelated actions.
 
-Include a "suggested skills" section in the document, which suggests skills that the agent should invoke.
+Include a "suggested skills" section in the document, naming which skills the next agent should call the Skill tool for.
 
 Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
 
