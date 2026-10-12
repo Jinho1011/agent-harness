@@ -8,6 +8,13 @@
       "installPath": "~/.agents/skills/add-shared-skill"
     },
     {
+      "name": "answer-me-with-html",
+      "source": "https://github.com/QingYunA/answer-me-with-html",
+      "sourceRevision": "4da5ae89ac435683110aa1b8707d9d4170184c55",
+      "treeSha256": "911225e9cc9eca712ddfc1af384b73a641adad3d4d53df4f6b4d34986d2a6d61",
+      "installPath": "~/.agents/skills/answer-me-with-html"
+    },
+    {
       "name": "ask-matt",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",

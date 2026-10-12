@@ -1,0 +1,3 @@
+interface:
+  display_name: "Answer me with HTML"
+  short_description: "Turn complex answers into visual HTML explainers"
