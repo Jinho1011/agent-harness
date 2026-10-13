@@ -202,12 +202,6 @@
       "installPath": "~/.agents/skills/triage"
     },
     {
-      "name": "ubuntu-ops",
-      "source": "local",
-      "treeSha256": "443d1c6396ec90ee495a1ba8df9c028e0c44e1c1723f9f786eca8436eb13af1a",
-      "installPath": "~/.agents/skills/ubuntu-ops"
-    },
-    {
       "name": "wayfinder",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",

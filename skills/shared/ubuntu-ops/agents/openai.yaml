@@ -1,3 +1,0 @@
-interface:
-  display_name: "Ubuntu Operations"
-  short_description: "Inspect agent setup and existing Ubuntu services"

@@ -99,7 +99,6 @@ tree checksum and either a pinned upstream source or a local origin.
 
 Manual-only skills remain installed and callable even when absent from the automatic catalog.
 `ponytail` now applies when requested for a task, rather than to every coding conversation.
-`ubuntu-ops` inspects agent CLI, OAuth, and service state and preserves local CLI setup.
 
 ### Guard hook
 
@@ -208,7 +207,6 @@ machines where Cursor is installed.
 | `to-spec` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `to-tickets` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `triage` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `ubuntu-ops` | authored here |
 | `wayfinder` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | `writing-great-skills` | [mattpocock/skills](https://github.com/mattpocock/skills) |
 
