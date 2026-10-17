@@ -1,0 +1,3 @@
+interface:
+  display_name: "PandaScript"
+  short_description: "Write repeatable Lightpanda browser automation scripts"

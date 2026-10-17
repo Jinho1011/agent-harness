@@ -142,13 +142,25 @@ fi
 
 # ---- MCP servers ---------------------------------------------------------------------------
 check 'local configuration values and skill discovery' python3 "$ROOT/scripts/check-config.py"
-while IFS=$'\t' read -r server url; do
+while IFS=$'\t' read -r server settings; do
   [[ -n "$server" ]] || continue
   if ! $OFFLINE && command -v claude >/dev/null 2>&1; then
     claude mcp get "$server" >/dev/null 2>&1 && pass "MCP $server registered in Claude Code" || fail "MCP $server registered in Claude Code"
   fi
   grep -q "^\[mcp_servers\.$server\]" "$HOME/.codex/config.toml" 2>/dev/null \
     && pass "MCP $server registered in Codex" || fail "MCP $server registered in Codex"
+  if jq -e '.command' <<<"$settings" >/dev/null; then
+    if has_cursor; then
+      jq -e --arg n "$server" --argjson s "$settings" '.mcpServers[$n] as $actual | $s | to_entries | all(.[]; $actual[.key] == .value)' "$HOME/.cursor/mcp.json" >/dev/null 2>&1 \
+        && pass "MCP $server registered in Cursor" || fail "MCP $server registered in Cursor"
+    fi
+    if has_agy; then
+      jq -e --arg n "$server" --argjson s "$settings" '.mcpServers[$n] as $actual | $s | to_entries | all(.[]; $actual[.key] == .value)' "$HOME/.gemini/config/mcp_config.json" >/dev/null 2>&1 \
+        && pass "MCP $server registered in Antigravity" || fail "MCP $server registered in Antigravity"
+    fi
+    continue
+  fi
+  url=$(jq -r '.url' <<<"$settings")
   if has_cursor; then
     jq -e --arg n "$server" --arg u "$url" '.mcpServers[$n].url == $u' "$HOME/.cursor/mcp.json" >/dev/null 2>&1 \
       && pass "MCP $server registered in Cursor" || fail "MCP $server registered in Cursor"
@@ -157,7 +169,7 @@ while IFS=$'\t' read -r server url; do
     jq -e --arg n "$server" --arg u "$url" '.mcpServers[$n].serverUrl == $u or .mcpServers[$n].url == $u' "$HOME/.gemini/config/mcp_config.json" >/dev/null 2>&1 \
       && pass "MCP $server registered in Antigravity" || fail "MCP $server registered in Antigravity"
   fi
-done < <(jq -r '.servers | to_entries[] | "\(.key)\t\(.value.url)"' "$ROOT/mcp.json")
+done < <(jq -r '.servers | to_entries[] | [.key, (.value | tojson)] | @tsv' "$ROOT/mcp.json")
 
 if (( failures > 0 )); then
   printf '\n%d check(s) failed.\n' "$failures" >&2

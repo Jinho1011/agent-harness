@@ -105,6 +105,13 @@
       "installPath": "~/.agents/skills/improve-codebase-architecture"
     },
     {
+      "name": "lightpanda",
+      "source": "https://github.com/lightpanda-io/agent-skill",
+      "sourceRevision": "387702e5b8d5034037a6a1ca7c41a727232e7cd4",
+      "treeSha256": "6a1c05c7cda3592a83369729fcc9c2d65ba8f390b43cd53707381ad3569b7b0d",
+      "installPath": "~/.agents/skills/lightpanda"
+    },
+    {
       "name": "orca-cli",
       "source": "https://github.com/stablyai/orca",
       "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
@@ -117,6 +124,13 @@
       "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
       "treeSha256": "3f6abcf68d8df39f7b66ca06e3f045b214df2e5b0b467b07f11c07b5359981d2",
       "installPath": "~/.agents/skills/orchestration"
+    },
+    {
+      "name": "pandascript",
+      "source": "https://github.com/lightpanda-io/agent-skill",
+      "sourceRevision": "387702e5b8d5034037a6a1ca7c41a727232e7cd4",
+      "treeSha256": "695486a953ff20b4f7278ff309edd4ba37138fcc6d302174c0f7008476ffd864",
+      "installPath": "~/.agents/skills/pandascript"
     },
     {
       "name": "ponytail",

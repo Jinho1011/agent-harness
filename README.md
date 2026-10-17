@@ -137,11 +137,16 @@ for Antigravity. Cursor CLI only picked up project-level definitions in testing,
 
 ### MCP servers
 
-`mcp.json` lists the servers every agent should have. Currently only Context7
-(`https://mcp.context7.com/mcp`, version-pinned library docs). `install.sh` registers each server at
+`mcp.json` lists the servers every agent should have: Context7
+(`https://mcp.context7.com/mcp`, version-pinned library docs) and the local Lightpanda browser
+(`lightpanda mcp`, stdio, telemetry disabled). Install Lightpanda on PATH first using the bundled
+`skills/shared/lightpanda/scripts/install.sh`; it verifies the official nightly binary checksum.
+Browser interaction defaults to Lightpanda through the shared instructions and skills; accurate
+visual checks and incompatible sites can use another browser. Start new agent sessions after
+installing to load the MCP server and skills. `install.sh` registers each server at
 user scope in Claude Code, appends a `[mcp_servers.<name>]` table to `~/.codex/config.toml`,
 merges it into `~/.cursor/mcp.json`, and registers it in `~/.gemini/config/mcp_config.json` (using
-`agy mcp add`). Removing a server from `mcp.json` does not unregister it; do that by hand
+`agy mcp add` for HTTP, direct JSON configuration for stdio). Removing a server from `mcp.json` does not unregister it; do that by hand
 (`claude mcp remove -s user <name>`, `agy mcp remove <name>`, edit `config.toml`, edit `mcp.json`).
 
 ## Customizing
@@ -160,7 +165,8 @@ merges it into `~/.cursor/mcp.json`, and registers it in `~/.gemini/config/mcp_c
 - **Guard patterns**: edit the `patterns` array in `hooks/guard-destructive.sh`. `doctor.sh` runs
   the hook against sample commands after every install.
 - **Subagents**: edit `agents/verifier.md`; the Codex TOML is regenerated on install.
-- **MCP**: add a server to `mcp.json` with its streamable HTTP `url`.
+- **MCP**: add a server to `mcp.json` with its streamable HTTP `url`, or a stdio `command`,
+  `args`, and optional `env`. Commands must be on PATH or use an absolute path.
 
 ## What it leaves alone
 

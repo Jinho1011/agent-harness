@@ -59,6 +59,9 @@ if args[:2]==['mcp','get']:
 if args[:2]==['mcp','add']:
  name,url=args[-2:]; d.setdefault('mcpServers',{})[name]={'url':url}
  p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d))
+if args[:2]==['mcp','add-json']:
+ name,settings=args[-2:]; d.setdefault('mcpServers',{})[name]=json.loads(settings)
+ p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d))
 '''
         for tool in ['claude', 'agy', 'cursor-agent']:
             path = self.bin / tool
@@ -176,6 +179,31 @@ if args[:2]==['mcp','add']:
         output = self.run_script('doctor.sh', '--offline', success=False).stdout
         for label in ['FAIL  Claude HUD', 'FAIL  MCP context7 Codex URL', 'FAIL  Codex verifier full contents']:
             self.assertIn(label, output)
+
+    def test_stdio_mcp_install_preserves_other_servers_and_doctor_detects_drift(self):
+        import tomllib
+        expected = json.loads((self.repo / 'mcp.json').read_text())['servers']['lightpanda']
+        self.write_json('.cursor/mcp.json', {'mcpServers': {'personal': {'command': 'keep-me'}}})
+        self.run_script('install.sh')
+        config = tomllib.loads((self.home / '.codex/config.toml').read_text())
+        self.assertEqual(config['mcp_servers']['lightpanda'], expected)
+        for relative in ['.claude.json', '.cursor/mcp.json', '.gemini/config/mcp_config.json']:
+            actual = json.loads((self.home / relative).read_text())['mcpServers']['lightpanda']
+            self.assertTrue(all(actual[key] == value for key, value in expected.items()), relative)
+        cursor = json.loads((self.home / '.cursor/mcp.json').read_text())
+        self.assertEqual(cursor['mcpServers']['personal'], {'command': 'keep-me'})
+        self.run_script('install.sh')
+        self.run_script('doctor.sh', '--offline')
+        for relative, label in [('.codex/config.toml', 'MCP lightpanda Codex stdio'),
+                                ('.claude.json', 'MCP lightpanda Claude stdio'),
+                                ('.cursor/mcp.json', 'MCP lightpanda registered in Cursor'),
+                                ('.gemini/config/mcp_config.json', 'MCP lightpanda registered in Antigravity')]:
+            path = self.home / relative
+            original = path.read_text()
+            path.write_text(original.replace('LIGHTPANDA_DISABLE_TELEMETRY', 'WRONG_ENV'))
+            result = self.run_script('doctor.sh', '--offline', success=False)
+            self.assertIn('FAIL  ' + label, result.stdout + result.stderr)
+            path.write_text(original)
 
 
 class GuardTests(unittest.TestCase):

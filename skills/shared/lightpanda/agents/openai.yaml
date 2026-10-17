@@ -1,0 +1,3 @@
+interface:
+  display_name: "Lightpanda"
+  short_description: "Browse and automate websites with the local Lightpanda browser"

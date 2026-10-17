@@ -60,9 +60,17 @@ def main():
         claude_path = home / '.claude.json'
         claude = json.loads(claude_path.read_text()) if claude_path.exists() else {}
         for server, settings in servers.items():
-            check('MCP ' + server + ' Codex URL', lambda: config.get('mcp_servers', {}).get(server, {}).get('url') == settings['url'])
-            if shutil.which('claude') or claude_path.exists():
-                check('MCP ' + server + ' Claude URL', lambda: claude.get('mcpServers', {}).get(server, {}).get('url') == settings['url'])
+            if 'command' in settings:
+                for label, actual in [('Codex', config.get('mcp_servers', {}).get(server, {})),
+                                      ('Claude', claude.get('mcpServers', {}).get(server, {}))]:
+                    if label == 'Claude' and not (shutil.which('claude') or claude_path.exists()):
+                        continue
+                    check('MCP ' + server + ' ' + label + ' stdio',
+                          lambda: all(actual.get(key) == value for key, value in settings.items()))
+            else:
+                check('MCP ' + server + ' Codex URL', lambda: config.get('mcp_servers', {}).get(server, {}).get('url') == settings['url'])
+                if shutil.which('claude') or claude_path.exists():
+                    check('MCP ' + server + ' Claude URL', lambda: claude.get('mcpServers', {}).get(server, {}).get('url') == settings['url'])
         expected = {'name': name, 'description': description, 'sandbox_mode': 'read-only',
                     'developer_instructions': body.removeprefix('\n').rstrip('\n') + '\n'}
         check('Codex verifier full contents', lambda: tomllib.loads((home / '.codex/agents/verifier.toml').read_text()) == expected)

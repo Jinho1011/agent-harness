@@ -145,7 +145,7 @@ if $DRY_RUN; then
       printf '%s\n' "${REMOVED[@]+"${REMOVED[@]}"}" | grep -Fxq -- "$name" || printf 'PRESERVE unmanaged %s\n' "$entry"
     done
   done
-  jq -r '.servers | to_entries[] | "MCP ensure \(.key) = \(.value.url) (no CLI executed)"' "$ROOT/mcp.json"
+  jq -r '.servers | to_entries[] | "MCP ensure \(.key) = \(.value.url // .value.command) (no CLI executed)"' "$ROOT/mcp.json"
   echo 'Dry run: no files changed or agent CLIs executed.'
   exit 0
 fi
@@ -296,8 +296,42 @@ if has_agy; then
 fi
 
 # ---- MCP servers ---------------------------------------------------------------------------
-while IFS=$'\t' read -r server url; do
+while IFS=$'\t' read -r server settings; do
   [[ -n "$server" ]] || continue
+  if jq -e '.command' <<<"$settings" >/dev/null; then
+    if command -v claude >/dev/null 2>&1; then
+      claude mcp get "$server" >/dev/null 2>&1 || claude mcp add-json --scope user "$server" "$(jq -c '. + {type: "stdio"}' <<<"$settings")" >/dev/null
+    else
+      echo "note: claude CLI not found; MCP server $server not registered for Claude Code"
+    fi
+    if ! grep -q "^\[mcp_servers\.$server\]" "$HOME/.codex/config.toml" 2>/dev/null; then
+      python3 - "$server" "$settings" >>"$HOME/.codex/config.toml" <<'PY'
+import json, sys
+name, settings = sys.argv[1], json.loads(sys.argv[2])
+print('\n[mcp_servers.' + name + ']')
+for key in ['command', 'args']:
+    if key in settings:
+        print(key + ' = ' + json.dumps(settings[key]))
+if settings.get('env'):
+    print('[mcp_servers.' + name + '.env]')
+    for key, value in settings['env'].items():
+        print(json.dumps(key) + ' = ' + json.dumps(value))
+PY
+    fi
+    if has_cursor; then
+      [[ -f "$HOME/.cursor/mcp.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.cursor/mcp.json"
+      jq --arg name "$server" --argjson settings "$settings" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = $settings' \
+        "$HOME/.cursor/mcp.json" | write_json "$HOME/.cursor/mcp.json"
+    fi
+    if has_agy; then
+      mkdir -p "$HOME/.gemini/config"
+      [[ -f "$HOME/.gemini/config/mcp_config.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.gemini/config/mcp_config.json"
+      jq --arg name "$server" --argjson settings "$settings" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = ($settings + {disabled: false})' \
+        "$HOME/.gemini/config/mcp_config.json" | write_json "$HOME/.gemini/config/mcp_config.json"
+    fi
+    continue
+  fi
+  url=$(jq -r '.url' <<<"$settings")
   if command -v claude >/dev/null 2>&1; then
     claude mcp get "$server" >/dev/null 2>&1 || claude mcp add --scope user --transport http "$server" "$url" >/dev/null
   else
@@ -322,7 +356,7 @@ while IFS=$'\t' read -r server url; do
         "$HOME/.gemini/config/mcp_config.json" | write_json "$HOME/.gemini/config/mcp_config.json"
     fi
   fi
-done < <(jq -r '.servers | to_entries[] | "\(.key)\t\(.value.url)"' "$ROOT/mcp.json")
+done < <(jq -r '.servers | to_entries[] | [.key, (.value | tojson)] | @tsv' "$ROOT/mcp.json")
 
 printf '%s\n' "$BACKUP" >"$STATE/latest-backup"
 printf '%s\n' "$ROOT" >"$STATE/root"

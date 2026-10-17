@@ -79,5 +79,10 @@ works, style.
 
 ## Environment
 
+- Use the shared `lightpanda` skill and MCP server by default for browser navigation, login,
+  form interaction, and page extraction. If MCP is unavailable, use `lightpanda` on PATH.
+  Use Chromium or another browser when Lightpanda cannot complete the task or the task needs
+  accurate visual rendering; explain the reason for switching. Existing project requirements
+  and explicitly requested browser tools take precedence.
 - Home, credential, PATH, and temporary paths come from the environment (`$HOME`, probing), never
   from a hardcoded machine.
