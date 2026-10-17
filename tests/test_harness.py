@@ -182,25 +182,28 @@ if args[:2]==['mcp','add-json']:
 
     def test_stdio_mcp_install_preserves_other_servers_and_doctor_detects_drift(self):
         import tomllib
-        expected = json.loads((self.repo / 'mcp.json').read_text())['servers']['lightpanda']
+        expected = {'command': 'fixture-mcp', 'args': ['serve'], 'env': {'FIXTURE_ENV': 'true'}}
+        mcp = json.loads((self.repo / 'mcp.json').read_text())
+        mcp['servers']['fixture'] = expected
+        (self.repo / 'mcp.json').write_text(json.dumps(mcp))
         self.write_json('.cursor/mcp.json', {'mcpServers': {'personal': {'command': 'keep-me'}}})
         self.run_script('install.sh')
         config = tomllib.loads((self.home / '.codex/config.toml').read_text())
-        self.assertEqual(config['mcp_servers']['lightpanda'], expected)
+        self.assertEqual(config['mcp_servers']['fixture'], expected)
         for relative in ['.claude.json', '.cursor/mcp.json', '.gemini/config/mcp_config.json']:
-            actual = json.loads((self.home / relative).read_text())['mcpServers']['lightpanda']
+            actual = json.loads((self.home / relative).read_text())['mcpServers']['fixture']
             self.assertTrue(all(actual[key] == value for key, value in expected.items()), relative)
         cursor = json.loads((self.home / '.cursor/mcp.json').read_text())
         self.assertEqual(cursor['mcpServers']['personal'], {'command': 'keep-me'})
         self.run_script('install.sh')
         self.run_script('doctor.sh', '--offline')
-        for relative, label in [('.codex/config.toml', 'MCP lightpanda Codex stdio'),
-                                ('.claude.json', 'MCP lightpanda Claude stdio'),
-                                ('.cursor/mcp.json', 'MCP lightpanda registered in Cursor'),
-                                ('.gemini/config/mcp_config.json', 'MCP lightpanda registered in Antigravity')]:
+        for relative, label in [('.codex/config.toml', 'MCP fixture Codex stdio'),
+                                ('.claude.json', 'MCP fixture Claude stdio'),
+                                ('.cursor/mcp.json', 'MCP fixture registered in Cursor'),
+                                ('.gemini/config/mcp_config.json', 'MCP fixture registered in Antigravity')]:
             path = self.home / relative
             original = path.read_text()
-            path.write_text(original.replace('LIGHTPANDA_DISABLE_TELEMETRY', 'WRONG_ENV'))
+            path.write_text(original.replace('FIXTURE_ENV', 'WRONG_ENV'))
             result = self.run_script('doctor.sh', '--offline', success=False)
             self.assertIn('FAIL  ' + label, result.stdout + result.stderr)
             path.write_text(original)

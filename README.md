@@ -138,11 +138,10 @@ for Antigravity. Cursor CLI only picked up project-level definitions in testing,
 ### MCP servers
 
 `mcp.json` lists the servers every agent should have: Context7
-(`https://mcp.context7.com/mcp`, version-pinned library docs) and the local Lightpanda browser
-(`lightpanda mcp`, stdio, telemetry disabled). Install Lightpanda on PATH first using the bundled
-`skills/shared/lightpanda/scripts/install.sh`; it verifies the official nightly binary checksum.
-Browser interaction defaults to Lightpanda through the shared instructions and skills; accurate
-visual checks and incompatible sites can use another browser. Start new agent sessions after
+(`https://mcp.context7.com/mcp`, version-pinned library docs). Browser interaction defaults to
+Chrome/Chromium through the shared `browser-use` skill: install its CLI with
+`uv tool install browser-use` and keep a Chrome/Chromium with remote debugging reachable (set
+`BU_CDP_URL` on headless servers). Start new agent sessions after
 installing to load the MCP server and skills. `install.sh` registers each server at
 user scope in Claude Code, appends a `[mcp_servers.<name>]` table to `~/.codex/config.toml`,
 merges it into `~/.cursor/mcp.json`, and registers it in `~/.gemini/config/mcp_config.json` (using

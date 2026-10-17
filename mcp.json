@@ -2,13 +2,6 @@
   "servers": {
     "context7": {
       "url": "https://mcp.context7.com/mcp"
-    },
-    "lightpanda": {
-      "command": "lightpanda",
-      "args": ["mcp"],
-      "env": {
-        "LIGHTPANDA_DISABLE_TELEMETRY": "true"
-      }
     }
   }
 }

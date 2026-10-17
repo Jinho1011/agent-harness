@@ -1,0 +1,3 @@
+interface:
+  display_name: "Browser Use"
+  short_description: "Drive Chrome/Chromium over CDP with the browser-use CLI"
