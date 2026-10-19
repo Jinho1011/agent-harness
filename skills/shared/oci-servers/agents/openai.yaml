@@ -1,0 +1,3 @@
+interface:
+  display_name: "OCI 서버 작업"
+  short_description: "Tailscale SSH로 기존 오라클 A1·Micro 서버에서 작업"

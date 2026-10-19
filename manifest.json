@@ -112,6 +112,12 @@
       "installPath": "~/.agents/skills/improve-codebase-architecture"
     },
     {
+      "name": "oci-servers",
+      "source": "local",
+      "treeSha256": "de15a6aed943269f668d92067ff0da673bcb07730c9914e5e4c5733f31deed27",
+      "installPath": "~/.agents/skills/oci-servers"
+    },
+    {
       "name": "orca-cli",
       "source": "https://github.com/stablyai/orca",
       "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
