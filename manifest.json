@@ -36,6 +36,13 @@
       "installPath": "~/.agents/skills/browser-use"
     },
     {
+      "name": "camera-systems",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "43b782c784aaf76eef6a1f3000eea5f402c51aeea86949ebd1a6a9518f637367",
+      "installPath": "~/.agents/skills/camera-systems"
+    },
+    {
       "name": "code-review",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
@@ -48,6 +55,13 @@
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "24ca44539eb30dea1a26465b024416c511f8046de7400addc0bfadd45273a067",
       "installPath": "~/.agents/skills/codebase-design"
+    },
+    {
+      "name": "create-game-assets",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "52e07f749c9929d631a6d9162d5668a27ddc524d94e0e96ce5d987e972c0c99a",
+      "installPath": "~/.agents/skills/create-game-assets"
     },
     {
       "name": "diagnosing-bugs",
@@ -69,6 +83,118 @@
       "sourceRevision": "a766623b062331fdde53467001379b4ddf3acc2f",
       "treeSha256": "eb860f44f1d09fa099122b553fbaafd323c427975b4288adc4386fab467b5652",
       "installPath": "~/.agents/skills/eli5"
+    },
+    {
+      "name": "game-ai",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "5c0e585c7fd084986a46a219df7a331c35fd2aaaee84c76b2bc5d36b86aecbe2",
+      "installPath": "~/.agents/skills/game-ai"
+    },
+    {
+      "name": "game-feel",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "7d0f7f17522eabeb9a7872239d491c2984ac5b9b250e83b42d1caabbcfc847e6",
+      "installPath": "~/.agents/skills/game-feel"
+    },
+    {
+      "name": "game-ui-ux",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "dc5da3f5036484d0ed5c5038f9ac92f3583d32c1696d9fc6b0e3383e5438c7dc",
+      "installPath": "~/.agents/skills/game-ui-ux"
+    },
+    {
+      "name": "godot-3d-essentials",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "759effdae25e89d43cc13709c3bec720b4e8b8b70e5b1343885f49d02e4b88c0",
+      "installPath": "~/.agents/skills/godot-3d-essentials"
+    },
+    {
+      "name": "godot-animation",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "e7cd92ec841db5a379972c24d754ab5327a6d0c9c08fd0c4795584e5bab0bba8",
+      "installPath": "~/.agents/skills/godot-animation"
+    },
+    {
+      "name": "godot-audio",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "db840041fac8002d96c8dfb0acdef13ed9baceeb51f033281e3812c43eae706b",
+      "installPath": "~/.agents/skills/godot-audio"
+    },
+    {
+      "name": "godot-export",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "09c5733e5bb4471616fb8cf34d44099a1bb228cec85800ae0e88ffdec8edd4f1",
+      "installPath": "~/.agents/skills/godot-export"
+    },
+    {
+      "name": "godot-gdscript",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "134ef8d267df154b89d32c0a1f6dd9755e7687613cca64f85df360999997f2ac",
+      "installPath": "~/.agents/skills/godot-gdscript"
+    },
+    {
+      "name": "godot-gdscript-headless-testing",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "5beff1198e0a4774c096f4b2ce5272ac6b13ccd4c711a074862562b0febc57f5",
+      "installPath": "~/.agents/skills/godot-gdscript-headless-testing"
+    },
+    {
+      "name": "godot-multiplayer",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "1873fb4d99cc4fb676f942504833fa8d2c21942232d4a8aaa3f7eae58fe939f5",
+      "installPath": "~/.agents/skills/godot-multiplayer"
+    },
+    {
+      "name": "godot-nodes-scenes",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "796a6763c24aeb0f96436612c0fd47ecf62cb0518bf300443de46535edfac50e",
+      "installPath": "~/.agents/skills/godot-nodes-scenes"
+    },
+    {
+      "name": "godot-physics",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "8bff64f8ac4e543d852ecf01a7fc3f7eac88c9453c29cbb6c3a854c4119b0609",
+      "installPath": "~/.agents/skills/godot-physics"
+    },
+    {
+      "name": "godot-resources",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "1b29a3912aba0347d8b4791e680cf73e8fcfbacf37e36695cae1de5d209e10c1",
+      "installPath": "~/.agents/skills/godot-resources"
+    },
+    {
+      "name": "godot-shaders",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "caff3bf6f5419a08e3fab9caab2e77d98054165e9aae63b246c8eda4ba1e723d",
+      "installPath": "~/.agents/skills/godot-shaders"
+    },
+    {
+      "name": "godot-signals-groups",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "156e2e1610eae7f8d48f5417a2b3c6df8abdfd8b7c08d1991bc27e6dc1f7dbd7",
+      "installPath": "~/.agents/skills/godot-signals-groups"
+    },
+    {
+      "name": "godot-ui-control",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "078025ea30b8750e6b61bb00d2c36a14a49698084b2a574dec3f074fc76bd804",
+      "installPath": "~/.agents/skills/godot-ui-control"
     },
     {
       "name": "grill-me",
@@ -119,6 +245,13 @@
       "installPath": "~/.agents/skills/improve-codebase-architecture"
     },
     {
+      "name": "input-systems",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "c6166806b87c138ce0cf5e4a37bb55df8ff1ce4ddb726e7fb2542f85bc66d820",
+      "installPath": "~/.agents/skills/input-systems"
+    },
+    {
       "name": "oci-servers",
       "source": "local",
       "treeSha256": "de15a6aed943269f668d92067ff0da673bcb07730c9914e5e4c5733f31deed27",
@@ -137,6 +270,13 @@
       "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
       "treeSha256": "3f6abcf68d8df39f7b66ca06e3f045b214df2e5b0b467b07f11c07b5359981d2",
       "installPath": "~/.agents/skills/orchestration"
+    },
+    {
+      "name": "performance-optimization",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "d114adfa7fd4defc0b6e2172e2e24c642d196cfb67656020540970b601d56c03",
+      "installPath": "~/.agents/skills/performance-optimization"
     },
     {
       "name": "ponytail",
@@ -172,6 +312,20 @@
       "sourceRevision": "a56f7bb668ab23fec8d33f7af353ac7ed2fe1895",
       "treeSha256": "c21a967807e4301ef2bcbef958307a14b2d10ff1ec9ddd96143f2eaa1eea1dba",
       "installPath": "~/.agents/skills/reverse-engineer-anything"
+    },
+    {
+      "name": "router",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "f35fc2c8ccb1c77e9b7c03149f6aad889ed035224cfd90f8d8da3eae3f0311fd",
+      "installPath": "~/.agents/skills/router"
+    },
+    {
+      "name": "save-systems",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "5851486f6a3b0f22e9c7b03197c7ab238386e73f27dc18e0bf1dbb7cdf105fe0",
+      "installPath": "~/.agents/skills/save-systems"
     },
     {
       "name": "setup-matt-pocock-skills",

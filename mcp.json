@@ -2,6 +2,25 @@
   "servers": {
     "context7": {
       "url": "https://mcp.context7.com/mcp"
+    },
+    "blender": {
+      "command": "uvx",
+      "args": [
+        "mcp-for-blender==2.2.7"
+      ],
+      "env": {
+        "DISABLE_TELEMETRY": "true"
+      }
+    },
+    "mobile-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mobilenext/mobile-mcp@1.0.16"
+      ],
+      "env": {
+        "MOBILEMCP_DISABLE_TELEMETRY": "1"
+      }
     }
   }
 }
