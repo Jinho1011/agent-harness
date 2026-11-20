@@ -57,6 +57,13 @@
       "installPath": "~/.agents/skills/codebase-design"
     },
     {
+      "name": "colab-operator",
+      "source": "https://github.com/googlecolab/google-colab-cli",
+      "sourceRevision": "0abf82dadc2b95c02b6ab2c08b1b4d664e616fbb",
+      "treeSha256": "f131d889af2345f00911309d5d91acfdd584e07f3f734e04139334cf8b290bd9",
+      "installPath": "~/.agents/skills/colab-operator"
+    },
+    {
       "name": "create-game-assets",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
@@ -374,6 +381,13 @@
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "a699caccdf79880d5a8c5638734fd64443f931763c45c7fcb18b3bb6bca34c6c",
       "installPath": "~/.agents/skills/triage"
+    },
+    {
+      "name": "unslop",
+      "source": "https://github.com/heydamir/unslop",
+      "sourceRevision": "620163eedb3529d9cd23a3994ed8d287d06f760d",
+      "treeSha256": "7927404572edab3d8199694deb1c62a9c6af3a95c568503b03eb2117a8d931af",
+      "installPath": "~/.agents/skills/unslop"
     },
     {
       "name": "wayfinder",

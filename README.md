@@ -103,13 +103,16 @@ Manual-only skills remain installed and callable even when absent from the autom
 ### Guard hook
 
 An instruction file is advisory; `hooks/guard-destructive.sh` is not. Registered as a `PreToolUse`
-hook for Bash in Claude Code and Codex, for `run_command` in Antigravity, and as `beforeShellExecution`
+hook for Bash in Codex, for `run_command` in Antigravity, and as `beforeShellExecution`
 in Cursor, it reads each shell command and stops it when it matches a guarded pattern: force pushes,
 branch deletion, history rewrites, `git reset --hard`, recursive `rm`, `find -delete`, disk and
 container wipes, `kubectl`/`terraform` apply or destroy, `DROP TABLE`, package publishing,
 `gh repo delete`, `gh pr merge`.
 
-In Claude Code and Antigravity the answer is `ask`, which prompts even in auto mode. Codex does
+Claude Code has no guard registration; installation removes legacy guard entries while preserving
+other hooks. It follows the autonomous execution policy in the shared instructions.
+
+In Antigravity the answer is `ask`, which prompts even in auto mode. Codex does
 not support `ask` yet, and Cursor auto-allows `ask` under `--yolo` and in non-interactive runs,
 so both get `deny` with a reason that tells the agent to get the user's confirmation. A command
 prefixed with `CONFIRMED=1` passes the guard, which is how an agent re-runs a command after the

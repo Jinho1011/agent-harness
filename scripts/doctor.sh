@@ -43,7 +43,7 @@ while IFS= read -r name; do SKILLS+=("$name"); done <<<"$SKILL_LIST"
 
 agy_skills=()
 if has_agy; then agy_skills=("$HOME/.gemini/config/skills"); fi
-unmanaged=$(comm -23 \
+unmanaged=$(LC_ALL=C comm -23 \
   <(find "$HOME/.agents/skills" "$HOME/.claude/skills" "${agy_skills[@]}" -mindepth 1 -maxdepth 1 2>/dev/null | sed 's|.*/||' | grep -v '^synced$' | LC_ALL=C sort -u) \
   <(printf '%s\n' "$SKILL_LIST"))
 if [[ -n "$unmanaged" ]]; then
@@ -101,7 +101,7 @@ sample_cursor='{"hook_event_name":"beforeShellExecution","command":"rm -rf build
 sample_agy='{"toolCall":{"name":"run_command","args":{"CommandLine":"git push --force origin main"}}}'
 sample_agy_plain='{"toolCall":{"name":"run_command","args":{"CommandLine":"git status"}}}'
 jq -e '.hookSpecificOutput.permissionDecision == "ask"' <<<"$(hook_out '--decision ask' "$sample_force")" >/dev/null 2>&1 \
-  && pass 'guard hook asks on a force push (Claude Code)' || fail 'guard hook asks on a force push (Claude Code)'
+  && pass 'guard hook asks on a force push (PreToolUse format)' || fail 'guard hook asks on a force push (PreToolUse format)'
 jq -e '.hookSpecificOutput.permissionDecision == "deny"' <<<"$(hook_out '--decision deny' "$sample_force")" >/dev/null 2>&1 \
   && pass 'guard hook denies on a force push (Codex)' || fail 'guard hook denies on a force push (Codex)'
 [[ -z "$(hook_out '--decision ask' "$sample_plain")" ]] \
@@ -116,8 +116,8 @@ jq -e '.decision == "allow"' <<<"$(hook_out '--decision ask' "$sample_agy_plain"
 count_pretooluse() {
   jq '[.hooks.PreToolUse[]? | select([.hooks[]?.command // ""] | any(contains("guard-destructive.sh")))] | length' "$1" 2>/dev/null
 }
-[[ "$(count_pretooluse "$HOME/.claude/settings.json")" == 1 ]] \
-  && pass 'guard hook registered once in Claude Code settings' || fail 'guard hook registered once in Claude Code settings'
+[[ "$(count_pretooluse "$HOME/.claude/settings.json")" == 0 ]] \
+  && pass 'Claude Code settings have no destructive-command guard' || fail 'Claude Code settings have no destructive-command guard'
 [[ "$(count_pretooluse "$HOME/.codex/hooks.json")" == 1 ]] \
   && pass 'guard hook registered once in Codex hooks.json' || fail 'guard hook registered once in Codex hooks.json'
 if has_cursor; then

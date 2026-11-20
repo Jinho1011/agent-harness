@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import tomllib
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,6 +57,8 @@ p=h/('.claude.json' if tool=='claude' else '.gemini/config/mcp_config.json')
 d=json.loads(p.read_text()) if p.exists() else {}
 if args[:2]==['mcp','get']:
  sys.exit(0 if args[2] in d.get('mcpServers',{}) else 1)
+if args[:2]==['mcp','remove']:
+ assert args[2:4]==['-s','user']; del d['mcpServers'][args[-1]]; p.write_text(json.dumps(d))
 if args[:2]==['mcp','add']:
  name,url=args[-2:]; d.setdefault('mcpServers',{})[name]={'url':url}
  p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d))
@@ -95,6 +98,13 @@ if args[:2]==['mcp','add-json']:
         self.run_script('install.sh', success=False)
         self.assertEqual(snapshot(self.home), before)
 
+    def test_fresh_install_creates_claude_settings_without_guard(self):
+        self.run_script('install.sh')
+        settings = json.loads((self.home / '.claude/settings.json').read_text())
+        commands = [h['command'] for m in settings.get('hooks', {}).get('PreToolUse', []) for h in m['hooks']]
+        self.assertFalse(any('guard-destructive.sh' in c for c in commands))
+        self.run_script('doctor.sh', '--offline')
+
     def test_install_preserves_local_settings_prunes_only_owned_and_restores(self):
         personal = self.home / '.agents/skills/personal/SKILL.md'
         personal.parent.mkdir(parents=True)
@@ -114,7 +124,7 @@ if args[:2]==['mcp','add-json']:
         self.assertEqual(after['model'], 'keep-me')
         commands = [h['command'] for m in after['hooks']['PreToolUse'] for h in m['hooks']]
         self.assertIn('orca-hook', commands)
-        self.assertEqual(sum('guard-destructive.sh' in c for c in commands), 1)
+        self.assertEqual(sum('guard-destructive.sh' in c for c in commands), 0)
         first_backup = (self.home / '.local/state/agent-harness/latest-backup').read_text().strip()
         manifest = self.repo / 'manifest.json'
         data = json.loads(manifest.read_text())
@@ -127,6 +137,9 @@ if args[:2]==['mcp','add-json']:
         self.assertIn('PRESERVE unmanaged', preview.stdout)
         self.assertEqual(snapshot(self.home), before)
         self.run_script('install.sh')
+        commands = [h['command'] for m in json.loads(settings.read_text())['hooks']['PreToolUse'] for h in m['hooks']]
+        self.assertIn('orca-hook', commands)
+        self.assertFalse(any('guard-destructive.sh' in c for c in commands))
         second_backup = (self.home / '.local/state/agent-harness/latest-backup').read_text().strip()
         self.assertNotEqual(first_backup, second_backup)
         self.assertFalse((self.home / '.agents/skills/beta').exists())
@@ -138,6 +151,71 @@ if args[:2]==['mcp','add-json']:
         self.assertTrue((self.home / '.agents/skills/beta/SKILL.md').is_file())
         restored = json.loads((self.home / '.local/state/agent-harness/installed-manifest.json').read_text())
         self.assertEqual(len(restored['skills']), 2)
+
+    def test_prune_managed_mcp_preview_and_restore(self):
+        paths = ['.claude.json', '.cursor/mcp.json', '.gemini/config/mcp_config.json']
+        personal = {'command': 'personal'}
+        for path in paths:
+            self.write_json(path, {'mcpServers': {'blender-personal': personal}, 'extra': True})
+        config = self.home / '.codex/config.toml'
+        config.parent.mkdir()
+        original = '# user config\n[mcp_servers.blender-personal]\ncommand = "personal"\n'
+        config.write_text(original)
+        self.run_script('install.sh')
+        source = self.repo / 'mcp.json'
+        servers = json.loads(source.read_text())
+        del servers['servers']['blender']
+        source.write_text(json.dumps(servers))
+        before = snapshot(self.home)
+        preview = self.run_script('install.sh', '--dry-run')
+        self.assertIn('REMOVE previously managed MCP blender', preview.stdout)
+        self.assertEqual(snapshot(self.home), before)
+        self.run_script('install.sh')
+        for path in paths:
+            data = json.loads((self.home / path).read_text())
+            self.assertNotIn('blender', data['mcpServers'])
+            self.assertEqual(data['mcpServers']['blender-personal'], personal)
+            self.assertTrue(data['extra'])
+        self.assertIn(original, config.read_text())
+        self.assertNotIn('blender', tomllib.loads(config.read_text())['mcp_servers'])
+        state = self.home / '.local/state/agent-harness'
+        self.run_script('restore.sh', (state / 'latest-backup').read_text().strip())
+        restored = snapshot(self.home)
+        for path in paths + ['.codex/config.toml', '.local/state/agent-harness/installed-manifest.json']:
+            self.assertEqual(restored[path], before[path])
+
+    def test_changed_mcp_specs_update_all_clients(self):
+        self.run_script('install.sh')
+        source = self.repo / 'mcp.json'
+        servers = json.loads(source.read_text())['servers']
+        servers['blender'].update(args=['serve', 'new'], env={'NEW': 'enabled'})
+        servers['context7']['url'] = 'https://example.test/new'
+        source.write_text(json.dumps({'servers': servers}))
+        self.run_script('install.sh')
+        self.run_script('doctor.sh', '--offline')
+        self.assertEqual(tomllib.loads((self.home / '.codex/config.toml').read_text())['mcp_servers'], servers)
+        for path in ['.claude.json', '.cursor/mcp.json', '.gemini/config/mcp_config.json']:
+            data = json.loads((self.home / path).read_text())['mcpServers']
+            self.assertEqual(data['blender']['args'], servers['blender']['args'])
+            self.assertEqual(data['blender']['env'], servers['blender']['env'])
+            self.assertEqual(data['context7'].get('serverUrl', data['context7'].get('url')), servers['context7']['url'])
+        calls = (self.home / 'cli-calls').read_text()
+        self.run_script('install.sh')
+        self.assertEqual((self.home / 'cli-calls').read_text(), calls)
+
+    def test_backup_retention(self):
+        state = self.home / '.local/state/agent-harness'
+        self.env['AGENT_HARNESS_KEEP_BACKUPS'] = '2'
+        backups = []
+        for _ in range(3):
+            self.run_script('install.sh')
+            backups.append(Path((state / 'latest-backup').read_text().strip()))
+        self.assertEqual(set((state / 'backups').iterdir()), set(backups[-2:]))
+        self.env['AGENT_HARNESS_KEEP_BACKUPS'] = '1'
+        self.run_script('install.sh', '--dry-run')
+        self.env['AGENT_HARNESS_KEEP_BACKUPS'] = '0'
+        self.run_script('install.sh', success=False)
+        self.assertEqual(set((state / 'backups').iterdir()), set(backups[-2:]))
 
     def test_skill_directory_symlink_backup_and_restore(self):
         external = self.home / 'personal-skills'
@@ -181,7 +259,6 @@ if args[:2]==['mcp','add-json']:
             self.assertIn(label, output)
 
     def test_stdio_mcp_install_preserves_other_servers_and_doctor_detects_drift(self):
-        import tomllib
         expected = {'command': 'fixture-mcp', 'args': ['serve'], 'env': {'FIXTURE_ENV': 'true'}}
         mcp = json.loads((self.repo / 'mcp.json').read_text())
         mcp['servers']['fixture'] = expected

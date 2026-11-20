@@ -1,0 +1,3 @@
+interface:
+  display_name: "Colab Operator"
+  short_description: "Run GPU/TPU workloads on Google Colab via colab CLI"

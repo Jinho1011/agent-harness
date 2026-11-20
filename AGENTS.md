@@ -43,9 +43,9 @@ works, style.
 
 - After two failed attempts at the same failure, stop. Report what was tried, what was ruled out,
   and the command that reproduces the problem, then propose the next step.
-- Destructive or outward-facing actions wait for explicit confirmation each time: deleting files
-  or branches, rewriting history, force pushes, changing remote or production state, sending
-  anything outside the machine.
+- Within the user's requested scope, proceed autonomously with necessary actions, including
+  deleting files or branches, rewriting history, force pushes, and changing remote or production
+  state, without asking for confirmation again. Ask when the scope or intent is unclear.
 
 ## Context
 
@@ -64,6 +64,30 @@ works, style.
 
 - When the user corrects a behavior that will recur, propose the one-line rule for the project's
   AGENTS.md or CLAUDE.md so the correction survives this session.
+
+## Orchestration worker selection
+
+- The user gives standing authorization for the coordinator to choose each Orca worker's
+  provider, model, and reasoning effort without asking per worker. This takes precedence
+  over a skill's "only pass a model when the user named one" preference. Explicit user
+  choices and project constraints still take precedence.
+- Choose among the user's available providers and verified supported models on the worker
+  host. Match capability to the task instead of inheriting the coordinator's settings:
+  - Lookup, inventory, summaries, documentation checks, and mechanical edits: a lightweight
+    model with low effort, or its lowest supported effort.
+  - Bounded implementation, ordinary bug fixes, and routine reviews: a standard model with
+    medium effort. This is the default when complexity is uncertain.
+  - Difficult design, ambiguous cross-module debugging, or consequential security review:
+    a stronger model with high effort when the task needs it.
+- Do not automatically use effort above high. Raise a task's tier only when its complexity
+  or observed reasoning failures justify it; environment and startup failures do not.
+  Existing retry limits and Orca settlement rules still apply.
+- For a fresh worker, pass the selected model and supported effort explicitly. Do not omit
+  them merely to inherit a potentially expensive default. If effort is unsupported, omit
+  that flag and report provider default rather than claiming a selected effort.
+- Verify launch.requested against launch.effective and report the choice with a short
+  reason, without requesting approval. Reuse a terminal only when its verified settings
+  suit the next task; model/effort overrides cannot accompany --terminal.
 
 ## HTML reports
 
@@ -85,3 +109,15 @@ works, style.
   Existing project requirements and explicitly requested browser tools take precedence.
 - Home, credential, PATH, and temporary paths come from the environment (`$HOME`, probing), never
   from a hardcoded machine.
+
+## Host service guardrails
+
+- New Docker services must bind host ports only to `127.0.0.1`, pin explicit image versions or
+  digests (never `:latest`), and set `mem_limit`, `pids_limit`, and `no-new-privileges`.
+- New user systemd services and timers must attach `10-on-failure.conf`
+  (`OnFailure=notify-failure@%n.service`), set `MemoryMax` on resident daemons, and register
+  stateful databases for encrypted off-host backup under `~/.config/jjh-backup/targets.d/`.
+- Special-purpose heavy stdio MCP servers (`rea`, `mobile-mcp`, etc.) belong only in the active
+  project root's `.mcp.json`, never in the global `agent-harness/mcp.json`.
+- When retiring a service or moving it to another host, run `service-retire <name>` to clean up
+  containers, units, ingress routes, and backup targets together.

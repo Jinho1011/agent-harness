@@ -9,6 +9,8 @@ BACKUP="$STATE/backups/$STAMP"
 TARGETS="$BACKUP/targets.tsv"
 HOOK="$HOME/.agents/hooks/guard-destructive.sh"
 PREVIOUS="$STATE/installed-manifest.json"
+KEEP_BACKUPS=${AGENT_HARNESS_KEEP_BACKUPS-10}
+[[ "$KEEP_BACKUPS" =~ ^[1-9][0-9]*$ ]] || { echo 'AGENT_HARNESS_KEEP_BACKUPS must be a positive integer' >&2; exit 1; }
 DRY_RUN=false
 case "${1:-}" in
   --dry-run) DRY_RUN=true ;;
@@ -67,8 +69,10 @@ python3 "$ROOT/scripts/check-config.py" --source >/dev/null || {
   echo 'source/configuration validation failed; run python3 scripts/check-config.py --source' >&2
   exit 1
 }
+removed_mcp='[]'
 REMOVED=()
 if [[ -f "$PREVIOUS" ]]; then
+  removed_mcp=$(jq -c --slurpfile current "$ROOT/mcp.json" '((.mcpServers // {}) | keys) - ($current[0].servers | keys)' "$PREVIOUS")
   previous_names=$(jq -er '.skills | map(.name) | .[]' "$PREVIOUS")
   while IFS= read -r name; do
     [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo 'invalid previous skill name' >&2; exit 1; }
@@ -146,6 +150,7 @@ if $DRY_RUN; then
     done
   done
   jq -r '.servers | to_entries[] | "MCP ensure \(.key) = \(.value.url // .value.command) (no CLI executed)"' "$ROOT/mcp.json"
+  jq -r '.[] | "REMOVE previously managed MCP \(.)"' <<<"$removed_mcp"
   echo 'Dry run: no files changed or agent CLIs executed.'
   exit 0
 fi
@@ -234,7 +239,16 @@ register_pretooluse() {
     ] | .[:$slot] + [{matcher:"Bash", hooks:[{type:"command", command:$command}]}] + .[$slot:])
   ' "$file" | write_json "$file"
 }
-register_pretooluse "$HOME/.claude/settings.json" ask
+# Claude Code follows the user's autonomous execution policy; remove legacy guard hooks.
+[[ -f "$HOME/.claude/settings.json" ]] || printf '{}\n' >"$HOME/.claude/settings.json"
+jq '
+  if .hooks.PreToolUse then
+    .hooks.PreToolUse |= map(
+      .hooks |= map(select(((.command // "") | contains("guard-destructive.sh")) | not)) |
+      select(.hooks | length > 0)
+    )
+  else . end
+' "$HOME/.claude/settings.json" | write_json "$HOME/.claude/settings.json"
 register_pretooluse "$HOME/.codex/hooks.json" deny
 
 if has_cursor; then
@@ -296,71 +310,61 @@ if has_agy; then
 fi
 
 # ---- MCP servers ---------------------------------------------------------------------------
-while IFS=$'\t' read -r server settings; do
-  [[ -n "$server" ]] || continue
-  if jq -e '.command' <<<"$settings" >/dev/null; then
-    if command -v claude >/dev/null 2>&1; then
-      claude mcp get "$server" >/dev/null 2>&1 || claude mcp add-json --scope user "$server" "$(jq -c '. + {type: "stdio"}' <<<"$settings")" >/dev/null
-    else
-      echo "note: claude CLI not found; MCP server $server not registered for Claude Code"
-    fi
-    if ! grep -q "^\[mcp_servers\.$server\]" "$HOME/.codex/config.toml" 2>/dev/null; then
-      python3 - "$server" "$settings" >>"$HOME/.codex/config.toml" <<'PY'
-import json, sys
-name, settings = sys.argv[1], json.loads(sys.argv[2])
-print('\n[mcp_servers.' + name + ']')
-for key in ['command', 'args']:
-    if key in settings:
-        print(key + ' = ' + json.dumps(settings[key]))
-if settings.get('env'):
-    print('[mcp_servers.' + name + '.env]')
-    for key, value in settings['env'].items():
-        print(json.dumps(key) + ' = ' + json.dumps(value))
-PY
-    fi
-    if has_cursor; then
-      [[ -f "$HOME/.cursor/mcp.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.cursor/mcp.json"
-      jq --arg name "$server" --argjson settings "$settings" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = $settings' \
-        "$HOME/.cursor/mcp.json" | write_json "$HOME/.cursor/mcp.json"
-    fi
-    if has_agy; then
-      mkdir -p "$HOME/.gemini/config"
-      [[ -f "$HOME/.gemini/config/mcp_config.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.gemini/config/mcp_config.json"
-      jq --arg name "$server" --argjson settings "$settings" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = ($settings + {disabled: false})' \
-        "$HOME/.gemini/config/mcp_config.json" | write_json "$HOME/.gemini/config/mcp_config.json"
-    fi
-    continue
-  fi
-  url=$(jq -r '.url' <<<"$settings")
-  if command -v claude >/dev/null 2>&1; then
-    claude mcp get "$server" >/dev/null 2>&1 || claude mcp add --scope user --transport http "$server" "$url" >/dev/null
+python3 "$ROOT/scripts/sync-codex-mcp.py" "$ROOT/mcp.json" "$removed_mcp"
+
+for client in cursor agy; do
+  if [[ "$client" == cursor ]]; then
+    has_cursor || continue
+    file="$HOME/.cursor/mcp.json"
   else
-    echo "note: claude CLI not found; MCP server $server not registered for Claude Code"
+    has_agy || continue
+    file="$HOME/.gemini/config/mcp_config.json"
   fi
-  # `codex mcp add --url` starts an OAuth login in a browser, so write the config table directly.
-  if ! grep -q "^\[mcp_servers\.$server\]" "$HOME/.codex/config.toml" 2>/dev/null; then
-    printf '\n[mcp_servers.%s]\nurl = "%s"\n' "$server" "$url" >>"$HOME/.codex/config.toml"
-  fi
-  if has_cursor; then
-    [[ -f "$HOME/.cursor/mcp.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.cursor/mcp.json"
-    jq --arg name "$server" --arg url "$url" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = {url:$url}' \
-      "$HOME/.cursor/mcp.json" | write_json "$HOME/.cursor/mcp.json"
-  fi
-  if has_agy; then
-    if command -v agy >/dev/null 2>&1; then
-      agy mcp add "$server" "$url" >/dev/null 2>&1 || true
-    else
-      mkdir -p "$HOME/.gemini/config"
-      [[ -f "$HOME/.gemini/config/mcp_config.json" ]] || printf '{"mcpServers":{}}\n' >"$HOME/.gemini/config/mcp_config.json"
-      jq --arg name "$server" --arg url "$url" '.mcpServers = (.mcpServers // {}) | .mcpServers[$name] = {disabled: false, serverUrl: $url}' \
-        "$HOME/.gemini/config/mcp_config.json" | write_json "$HOME/.gemini/config/mcp_config.json"
+  [[ -f "$file" ]] || printf '{}\n' >"$file"
+  jq --arg client "$client" --argjson removed "$removed_mcp" --slurpfile current "$ROOT/mcp.json" '
+    .mcpServers = ((.mcpServers // {} | delpaths($removed | map([.]))) +
+      ($current[0].servers | with_entries(
+        if $client == "agy" then .value |=
+          (if .url then {serverUrl: .url} else . end) + {disabled: false}
+        else . end)))
+  ' "$file" | write_json "$file"
+done
+
+if command -v claude >/dev/null 2>&1; then
+  claude_file="$HOME/.claude.json"
+  while IFS= read -r server; do
+    if [[ -f "$claude_file" ]] && jq -e --arg name "$server" '.mcpServers[$name] != null' "$claude_file" >/dev/null; then
+      claude mcp remove -s user "$server" >/dev/null
     fi
-  fi
-done < <(jq -r '.servers | to_entries[] | [.key, (.value | tojson)] | @tsv' "$ROOT/mcp.json")
+  done < <(jq -r '.[]' <<<"$removed_mcp")
+  while IFS= read -r entry; do
+    server=$(jq -r '.key' <<<"$entry")
+    settings=$(jq -c '.value | . + {type: (if .command then "stdio" else "http" end)}' <<<"$entry")
+    if [[ -f "$claude_file" ]]; then
+      installed=$(jq -c --arg name "$server" '.mcpServers[$name]' "$claude_file")
+      if jq -e --argjson expected "$settings" '. == $expected' <<<"$installed" >/dev/null; then continue; fi
+      if [[ "$installed" != null ]]; then claude mcp remove -s user "$server" >/dev/null; fi
+    fi
+    claude mcp add-json --scope user "$server" "$settings" >/dev/null
+  done < <(jq -c '.servers | to_entries[]' "$ROOT/mcp.json")
+else
+  echo "note: claude CLI not found; skipping Claude Code MCP registration"
+fi
 
 printf '%s\n' "$BACKUP" >"$STATE/latest-backup"
 printf '%s\n' "$ROOT" >"$STATE/root"
-cp "$MANIFEST" "$PREVIOUS"
+jq --slurpfile current "$ROOT/mcp.json" '.mcpServers = $current[0].servers' "$MANIFEST" | write_json "$PREVIOUS"
+python3 - "$BACKUP" "$KEEP_BACKUPS" <<'PYTHON'
+from pathlib import Path
+import shutil
+import sys
+
+current = Path(sys.argv[1])
+older = sorted((p for p in current.parent.iterdir() if p != current and not p.is_symlink() and p.is_dir()),
+               key=lambda p: (p.stat().st_mtime_ns, p.name), reverse=True)
+for backup in older[int(sys.argv[2]) - 1:]:
+    shutil.rmtree(backup)
+PYTHON
 echo "Installed shared harness. Backup: $BACKUP"
 echo "Run: $ROOT/scripts/doctor.sh"
 if command -v codex >/dev/null 2>&1; then

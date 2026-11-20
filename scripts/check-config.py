@@ -13,7 +13,10 @@ import tomllib
 
 def tree_sha(root):
     digest = hashlib.sha256()
-    for path in sorted(p for p in root.rglob('*') if p.is_file() and not p.is_symlink()):
+    for path in sorted(
+        (p for p in root.rglob('*') if p.is_file() and not p.is_symlink()),
+        key=lambda p: './' + p.relative_to(root).as_posix(),
+    ):
         digest.update(('./' + path.relative_to(root).as_posix() + '\n').encode())
         digest.update((hashlib.sha256(path.read_bytes()).hexdigest() + '\n').encode())
     return digest.hexdigest()
