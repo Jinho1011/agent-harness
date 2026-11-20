@@ -1,30 +1,26 @@
 # agent-harness
 
-One repository that gives **Claude Code**, **Codex CLI**, **Cursor CLI**, and **Antigravity CLI (`agy`)** the same instructions,
-skills, guard hook, verifier subagent, and MCP servers on every machine you use. Clone it, run one
-script, and each agent reads the same `AGENTS.md`, sees the same skills, and stops before the same
-destructive commands. Run it again after `git pull` to update; `doctor.sh` proves the result.
+Install shared instructions, skill profiles, shell guards, a verifier and MCP servers for your coding agents.
 
 ## What you get
 
-| Area | Installed to | Source in this repo |
-|---|---|---|
-| Shared instructions | `~/.agents/AGENTS.md`; `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/GEMINI.md` (Gemini CLI), and `~/.gemini/config/rules/AGENTS.md` (AGY) are symlinks to it | `AGENTS.md` |
-| Shared skills (27) | `~/.agents/skills/<name>` (read by Codex and Cursor) + `~/.claude/skills/<name>` and `~/.gemini/config/skills/<name>` symlinks | `skills/shared/` |
-| Destructive-command guard hook | `~/.agents/hooks/guard-destructive.sh`, registered in `~/.claude/settings.json`, `~/.codex/hooks.json`, `~/.cursor/hooks.json`, `~/.gemini/config/hooks.json` | `hooks/` |
-| `verifier` subagent | `~/.claude/agents/verifier.md`; rendered to `~/.codex/agents/verifier.toml` and `~/.gemini/config/agents/verifier/agent.md` | `agents/` |
-| MCP servers | `claude mcp` user scope, `[mcp_servers.*]` in `~/.codex/config.toml`, `~/.cursor/mcp.json`, `~/.gemini/config/mcp_config.json` | `mcp.json` |
-
-Everything is copied from this repository, backed up before it is replaced, and verified by
-`scripts/doctor.sh`. Anything not in the table is deliberately left to the machine.
+<!-- BEGIN:SUMMARY_TABLE -->
+| Area | Targets and configuration |
+| --- | --- |
+| Instructions | Claude Code, Codex, Antigravity and Gemini CLI. Set Cursor User Rules manually. |
+| Shared skills (59) | Codex and Cursor read `~/.agents/skills`. Claude Code and Antigravity use symlinks. |
+| Shell guard | claude off, codex deny, cursor deny, antigravity ask |
+| Verifier | Claude Code, Codex and Antigravity. Copy into Cursor projects manually. |
+| MCP servers | blender (User), context7 (User), mobile-mcp (Project (optional)), rea (Project (optional)) |
+<!-- END:SUMMARY_TABLE -->
 
 ## Requirements
 
 - bash 3.2 or newer (the stock macOS bash works), Python 3.11+, `jq`, `git`, and `sha256sum` or `shasum`
 - Optional: `shfmt` lets the guard recognize literal output/search data. Without it, matching stays conservative.
 - Linux or macOS, including WSL
-- Optional: the `claude`, `codex`, `cursor-agent`, and `agy` CLIs. Registration steps for an agent that is
-  not installed are skipped.
+- Claude and Codex configuration files are installed on every machine. Claude MCP registration uses
+  the `claude` CLI when available. Cursor and Antigravity are detected by configuration directory or CLI.
 
 ## Quick start
 
@@ -38,8 +34,12 @@ cd ~/.config/agent-harness
 ./scripts/doctor.sh --offline
 ```
 
+Use `./scripts/install.sh --dry-run --profiles core` to preview a smaller installation, then
+`./scripts/install.sh --profiles core` to apply it. Pass `gamedev`, `core,gamedev`, or `all` to
+change the selection. Installs reuse the previous selection and default to `all` on first install.
+
 The clone can live anywhere; `install.sh` records its path in `~/.local/state/agent-harness/root`.
-Start new agent sessions afterwards. If you use Codex, run `/hooks` inside it once to trust the
+Start new agent sessions afterwards. If the Codex guard is enabled, run `/hooks` inside it once to trust the
 guard hook.
 
 `--dry-run` validates source checksums and configuration, then lists writes and removals without
@@ -69,9 +69,8 @@ are overwritten by the next install, so keep customizations in a fork.
 
 ### Instructions
 
-`AGENTS.md` is a **user-level** instruction file: judgment rules that apply in any repository, kept
-agent-neutral (no tool names), where every line has to change behavior versus the agent's default or
-it gets cut. Project commands, layout, and commit conventions belong in each project's own
+`AGENTS.md` is a **user-level** instruction file: judgment rules that apply across repositories.
+Project commands, layout, and commit conventions belong in each project's own
 `AGENTS.md` or `CLAUDE.md`, which take precedence.
 
 The text draws on Anthropic's Claude Code best practices (verification first, evidence over claims,
@@ -89,34 +88,31 @@ by default, and the final response includes a verified browser link.
 
 ### Skills
 
-`skills/shared/` is the single source of truth. `install.sh` copies each skill to
+`skills/shared/` is the single source of truth. `install.sh` copies each selected skill to
 `~/.agents/skills/<name>`, which Codex and Cursor read natively, and symlinks it into
 `~/.claude/skills/<name>` for Claude Code and `~/.gemini/config/skills/<name>` for Antigravity (`agy`).
 It preserves unrelated personal skills. Only names in the previous successful installation's
-`~/.local/state/agent-harness/installed-manifest.json` that disappear from the current manifest
+`~/.local/state/agent-harness/installed-manifest.json` that fall outside the current selection or leave the manifest
 are pruned, after backup. With no previous record, nothing is inferred or pruned. Skills have a
 tree checksum and either a pinned upstream source or a local origin.
 
-Manual-only skills remain installed and callable even when absent from the automatic catalog.
+Selected manual-only skills remain installed and callable even when absent from the automatic catalog.
 `ponytail` now applies when requested for a task, rather than to every coding conversation.
 
 ### Guard hook
 
-An instruction file is advisory; `hooks/guard-destructive.sh` is not. Registered as a `PreToolUse`
-hook for Bash in Codex, for `run_command` in Antigravity, and as `beforeShellExecution`
-in Cursor, it reads each shell command and stops it when it matches a guarded pattern: force pushes,
-branch deletion, history rewrites, `git reset --hard`, recursive `rm`, `find -delete`, disk and
-container wipes, `kubectl`/`terraform` apply or destroy, `DROP TABLE`, package publishing,
-`gh repo delete`, `gh pr merge`.
+<!-- BEGIN:GUARD_TABLE -->
+| Agent | Mode | Rationale |
+| --- | --- | --- |
+| claude | off | Use the shared instructions for approval decisions. |
+| codex | deny | Block the command until the user confirms. Codex lacks an interactive ask decision. |
+| cursor | deny | Block the command until the user confirms. Cursor can auto-allow ask in unattended sessions. |
+| antigravity | ask | Prompt for confirmation on a guarded command. |
+<!-- END:GUARD_TABLE -->
 
-Claude Code has no guard registration; installation removes legacy guard entries while preserving
-other hooks. It follows the autonomous execution policy in the shared instructions.
-
-In Antigravity the answer is `ask`, which prompts even in auto mode. Codex does
-not support `ask` yet, and Cursor auto-allows `ask` under `--yolo` and in non-interactive runs,
-so both get `deny` with a reason that tells the agent to get the user's confirmation. A command
-prefixed with `CONFIRMED=1` passes the guard, which is how an agent re-runs a command after the
-user said yes.
+The hook checks shell commands for destructive patterns such as force pushes, recursive deletion,
+and package publishing. After explicit user confirmation, the agent can prefix the command with
+`CONFIRMED=1`. Installation applies each agent’s mode from `manifest.json` and preserves other hooks.
 
 With `shfmt`, standalone literal `echo`, `printf` with literal/`%s`/`%%` formats,
 `grep -F --`, and `rg --no-config --` calls
@@ -125,8 +121,7 @@ interpreters (including Python heredocs), SQL and parse failures retain conserva
 Python test-data strings can therefore still cause false positives; keep regression inputs in
 fixture files. The guard is a command-pattern check, not a sandbox or an interpreter analyzer.
 
-`install.sh` merges its entry into each agent's hook file and leaves every other hook in place.
-Codex requires each machine to trust a hook once: run `/hooks` inside `codex` after installing.
+Trust an enabled Codex guard once per machine by running `/hooks` inside Codex.
 
 ### Verifier subagent
 
@@ -140,16 +135,22 @@ for Antigravity. Cursor CLI only picked up project-level definitions in testing,
 
 ### MCP servers
 
-`mcp.json` lists the servers every agent should have: Context7
-(`https://mcp.context7.com/mcp`, version-pinned library docs). Browser interaction defaults to
-Chrome/Chromium through the shared `browser-use` skill: install its CLI with
-`uv tool install browser-use` and keep a Chrome/Chromium with remote debugging reachable (set
-`BU_CDP_URL` on headless servers). Start new agent sessions after
-installing to load the MCP server and skills. `install.sh` registers each server at
-user scope in Claude Code, appends a `[mcp_servers.<name>]` table to `~/.codex/config.toml`,
-merges it into `~/.cursor/mcp.json`, and registers it in `~/.gemini/config/mcp_config.json` (using
-`agy mcp add` for HTTP, direct JSON configuration for stdio). Removing a server from `mcp.json` does not unregister it; do that by hand
-(`claude mcp remove -s user <name>`, `agy mcp remove <name>`, edit `config.toml`, edit `mcp.json`).
+<!-- BEGIN:MCP_TABLE -->
+| Server | Scope | Transport | Target |
+| --- | --- | --- | --- |
+| blender | User | stdio | `uvx mcp-for-blender==2.2.7` |
+| context7 | User | HTTP | `https://mcp.context7.com/mcp` |
+| mobile-mcp | Project (optional) | stdio | `npx -y @mobilenext/mobile-mcp@1.0.16` |
+| rea | Project (optional) | stdio | `npx -y rea-agents@6.4.0 mcp` |
+<!-- END:MCP_TABLE -->
+
+The installer registers global entries from `mcp.json` in Claude user scope and in the Codex,
+Cursor and Antigravity configuration files. It prunes previously managed global entries removed
+from the catalog. Merge desired entries from `mcp-optional.json` into the project’s `.mcp.json`
+under `mcpServers`.
+
+Browser interaction uses Chrome/Chromium through the shared `browser-use` skill. Install its CLI
+with `uv tool install browser-use` and set `BU_CDP_URL` for a remote debugging browser.
 
 ## Customizing
 
@@ -177,46 +178,81 @@ MCP servers, and provider-specific plugins. In `~/.claude/settings.json`, `~/.co
 and the Cursor files the harness edits only its own entries, and it touches `~/.cursor` only on
 machines where Cursor is installed.
 
-## Scripts
+## Harness management scripts
 
 | Script | Purpose |
 |---|---|
-| `scripts/install.sh [--dry-run]` | Preview or install; back up targets; prune only previously managed skills |
+| `scripts/install.sh [--dry-run] [--profiles csv/all]` | Preview or install; back up targets; prune only previously managed skills |
 | `scripts/doctor.sh [--offline]` | Verify checksums, discovery, symlinks, hooks, verifier contents, HUD paths and MCP values |
-| `scripts/check-config.py [--source]` | Validate source or installed configuration locally with Python 3.11+ |
-| `scripts/sync-manifest.sh` | Rebuild `manifest.json` skill entries and `treeSha256` from `skills/shared/` |
+| `scripts/check-config.py [--source] [--check-readme]` | Validate source or installed configuration locally with Python 3.11+ |
+| `scripts/sync-manifest.sh` | Rebuild `manifest.json` skill entries and `treeSha256` from `skills/shared/` and refresh the README tables |
 | `scripts/restore.sh` | Roll back only the targets this repository manages |
 
 ## Skills
 
-| Skill | Source |
-|---|---|
-| `add-shared-skill` | authored here |
-| `ask-matt` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `code-review` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `codebase-design` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `diagnosing-bugs` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `domain-modeling` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `eli5` | [dreambigou/eli5](https://github.com/dreambigou/eli5) |
-| `grill-me` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `grill-with-docs` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `grilling` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `handoff` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `implement` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `improve-codebase-architecture` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `ponytail` | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) |
-| `prototype` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `research` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `resolving-merge-conflicts` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `setup-matt-pocock-skills` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `starter-kit` | authored here |
-| `tdd` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `teach` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `to-spec` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `to-tickets` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `triage` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `wayfinder` | [mattpocock/skills](https://github.com/mattpocock/skills) |
-| `writing-great-skills` | [mattpocock/skills](https://github.com/mattpocock/skills) |
+<!-- BEGIN:SKILLS_TABLE -->
+| Skill | Source | Profiles | Invocation |
+| --- | --- | --- | --- |
+| add-shared-skill | local | core | auto |
+| answer-me-with-html | [QingYunA/answer-me-with-html](https://github.com/QingYunA/answer-me-with-html) | core | auto |
+| asd-ste100 | [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) | core | auto |
+| ask-matt | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| browser-use | [browser-use/browser-use](https://github.com/browser-use/browser-use) | core | auto |
+| camera-systems | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| code-review | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| codebase-design | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| colab-operator | [googlecolab/google-colab-cli](https://github.com/googlecolab/google-colab-cli) | core | auto |
+| create-game-assets | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| diagnosing-bugs | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| domain-modeling | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| eli5 | [dreambigou/eli5](https://github.com/dreambigou/eli5) | core | auto |
+| game-ai | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| game-feel | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| game-ui-ux | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-3d-essentials | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-animation | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-audio | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-export | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-gdscript | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-gdscript-headless-testing | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-multiplayer | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-nodes-scenes | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-physics | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-resources | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-shaders | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-signals-groups | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| godot-ui-control | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| grill-me | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| grill-with-docs | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| grilling | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| handoff | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| html-report | local | core | auto |
+| impeccable | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | core | auto |
+| implement | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| improve-codebase-architecture | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| input-systems | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| oci-servers | local | core | auto |
+| orca-cli | [stablyai/orca](https://github.com/stablyai/orca) | core | auto |
+| orchestration | [stablyai/orca](https://github.com/stablyai/orca) | core | auto |
+| performance-optimization | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| ponytail | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | core | auto |
+| prototype | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| research | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| resolving-merge-conflicts | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| reverse-engineer-anything | [morluto/rea](https://github.com/morluto/rea) | core | auto |
+| router | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| save-systems | [gamedev-skills/awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) | gamedev | auto |
+| setup-matt-pocock-skills | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| starter-kit | local | core | auto |
+| tdd | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
+| teach | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| to-spec | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| to-tickets | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| triage | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| unslop | [heydamir/unslop](https://github.com/heydamir/unslop) | core | auto |
+| wayfinder | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| writing-great-skills | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+<!-- END:SKILLS_TABLE -->
 
 Upstream licenses are reproduced in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 

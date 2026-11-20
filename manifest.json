@@ -1,407 +1,597 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "skills": [
     {
       "name": "add-shared-skill",
       "source": "local",
       "treeSha256": "5dd2085e4f60b8645f829ed56956f121b6f67d880643c7340d90504949f879d3",
-      "installPath": "~/.agents/skills/add-shared-skill"
+      "installPath": "~/.agents/skills/add-shared-skill",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "answer-me-with-html",
       "source": "https://github.com/QingYunA/answer-me-with-html",
       "sourceRevision": "bc3798a87c5721b296b2d0f464c8fc4a0bcea2a5",
       "treeSha256": "b2fa73fb5cc0225f63ebd41086e5be917bb1f572dbd1d3110fc79655d06c4a44",
-      "installPath": "~/.agents/skills/answer-me-with-html"
+      "installPath": "~/.agents/skills/answer-me-with-html",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "asd-ste100",
       "source": "https://github.com/danyuchn/asd-ste100-skill",
       "sourceRevision": "fd86652be0d5d3485c69e1529dfd1fa3c9a7a640",
       "treeSha256": "b6ec67a2816d32cbd03c97f750b36bc070f3fce00db7c949caeedc0b19bc6630",
-      "installPath": "~/.agents/skills/asd-ste100"
+      "installPath": "~/.agents/skills/asd-ste100",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "ask-matt",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "63e66ad8367bf6c9908ab3c536929f32cab5e459699e72ea7ee2082e74bd2a1e",
-      "installPath": "~/.agents/skills/ask-matt"
+      "installPath": "~/.agents/skills/ask-matt",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "browser-use",
       "source": "https://github.com/browser-use/browser-use",
       "sourceRevision": "914c59bdd4acd50e9628a97a96a3919313aebc85",
       "treeSha256": "fceede523c8956db46cc23561a3da392b78619f0b1646ff5388b81cab63fc442",
-      "installPath": "~/.agents/skills/browser-use"
+      "installPath": "~/.agents/skills/browser-use",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "camera-systems",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "43b782c784aaf76eef6a1f3000eea5f402c51aeea86949ebd1a6a9518f637367",
-      "installPath": "~/.agents/skills/camera-systems"
+      "installPath": "~/.agents/skills/camera-systems",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "code-review",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "4bd98d948aa1d69b4e72db276ccac7c902187e03d59a6958705878a976154eaa",
-      "installPath": "~/.agents/skills/code-review"
+      "installPath": "~/.agents/skills/code-review",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "codebase-design",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "24ca44539eb30dea1a26465b024416c511f8046de7400addc0bfadd45273a067",
-      "installPath": "~/.agents/skills/codebase-design"
+      "installPath": "~/.agents/skills/codebase-design",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "colab-operator",
       "source": "https://github.com/googlecolab/google-colab-cli",
       "sourceRevision": "0abf82dadc2b95c02b6ab2c08b1b4d664e616fbb",
       "treeSha256": "f131d889af2345f00911309d5d91acfdd584e07f3f734e04139334cf8b290bd9",
-      "installPath": "~/.agents/skills/colab-operator"
+      "installPath": "~/.agents/skills/colab-operator",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "create-game-assets",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "52e07f749c9929d631a6d9162d5668a27ddc524d94e0e96ce5d987e972c0c99a",
-      "installPath": "~/.agents/skills/create-game-assets"
+      "installPath": "~/.agents/skills/create-game-assets",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "diagnosing-bugs",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "d0a193ed9c0a64aa8266abbbbda37c88975a3835b9d00f5c989e37c77c92871c",
-      "installPath": "~/.agents/skills/diagnosing-bugs"
+      "installPath": "~/.agents/skills/diagnosing-bugs",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "domain-modeling",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "ef7dcc0750bce2be67b4a320858b2d7620649d351cbca3f3ddf8bfe349f77bce",
-      "installPath": "~/.agents/skills/domain-modeling"
+      "installPath": "~/.agents/skills/domain-modeling",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "eli5",
       "source": "https://github.com/dreambigou/eli5",
       "sourceRevision": "a766623b062331fdde53467001379b4ddf3acc2f",
       "treeSha256": "eb860f44f1d09fa099122b553fbaafd323c427975b4288adc4386fab467b5652",
-      "installPath": "~/.agents/skills/eli5"
+      "installPath": "~/.agents/skills/eli5",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "game-ai",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "5c0e585c7fd084986a46a219df7a331c35fd2aaaee84c76b2bc5d36b86aecbe2",
-      "installPath": "~/.agents/skills/game-ai"
+      "installPath": "~/.agents/skills/game-ai",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "game-feel",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "7d0f7f17522eabeb9a7872239d491c2984ac5b9b250e83b42d1caabbcfc847e6",
-      "installPath": "~/.agents/skills/game-feel"
+      "installPath": "~/.agents/skills/game-feel",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "game-ui-ux",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "dc5da3f5036484d0ed5c5038f9ac92f3583d32c1696d9fc6b0e3383e5438c7dc",
-      "installPath": "~/.agents/skills/game-ui-ux"
+      "installPath": "~/.agents/skills/game-ui-ux",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-3d-essentials",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "759effdae25e89d43cc13709c3bec720b4e8b8b70e5b1343885f49d02e4b88c0",
-      "installPath": "~/.agents/skills/godot-3d-essentials"
+      "installPath": "~/.agents/skills/godot-3d-essentials",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-animation",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "e7cd92ec841db5a379972c24d754ab5327a6d0c9c08fd0c4795584e5bab0bba8",
-      "installPath": "~/.agents/skills/godot-animation"
+      "installPath": "~/.agents/skills/godot-animation",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-audio",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "db840041fac8002d96c8dfb0acdef13ed9baceeb51f033281e3812c43eae706b",
-      "installPath": "~/.agents/skills/godot-audio"
+      "installPath": "~/.agents/skills/godot-audio",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-export",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "09c5733e5bb4471616fb8cf34d44099a1bb228cec85800ae0e88ffdec8edd4f1",
-      "installPath": "~/.agents/skills/godot-export"
+      "installPath": "~/.agents/skills/godot-export",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-gdscript",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "134ef8d267df154b89d32c0a1f6dd9755e7687613cca64f85df360999997f2ac",
-      "installPath": "~/.agents/skills/godot-gdscript"
+      "installPath": "~/.agents/skills/godot-gdscript",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-gdscript-headless-testing",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "5beff1198e0a4774c096f4b2ce5272ac6b13ccd4c711a074862562b0febc57f5",
-      "installPath": "~/.agents/skills/godot-gdscript-headless-testing"
+      "installPath": "~/.agents/skills/godot-gdscript-headless-testing",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-multiplayer",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "1873fb4d99cc4fb676f942504833fa8d2c21942232d4a8aaa3f7eae58fe939f5",
-      "installPath": "~/.agents/skills/godot-multiplayer"
+      "installPath": "~/.agents/skills/godot-multiplayer",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-nodes-scenes",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "796a6763c24aeb0f96436612c0fd47ecf62cb0518bf300443de46535edfac50e",
-      "installPath": "~/.agents/skills/godot-nodes-scenes"
+      "installPath": "~/.agents/skills/godot-nodes-scenes",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-physics",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "8bff64f8ac4e543d852ecf01a7fc3f7eac88c9453c29cbb6c3a854c4119b0609",
-      "installPath": "~/.agents/skills/godot-physics"
+      "installPath": "~/.agents/skills/godot-physics",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-resources",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "1b29a3912aba0347d8b4791e680cf73e8fcfbacf37e36695cae1de5d209e10c1",
-      "installPath": "~/.agents/skills/godot-resources"
+      "installPath": "~/.agents/skills/godot-resources",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-shaders",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "caff3bf6f5419a08e3fab9caab2e77d98054165e9aae63b246c8eda4ba1e723d",
-      "installPath": "~/.agents/skills/godot-shaders"
+      "installPath": "~/.agents/skills/godot-shaders",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-signals-groups",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "156e2e1610eae7f8d48f5417a2b3c6df8abdfd8b7c08d1991bc27e6dc1f7dbd7",
-      "installPath": "~/.agents/skills/godot-signals-groups"
+      "installPath": "~/.agents/skills/godot-signals-groups",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "godot-ui-control",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "078025ea30b8750e6b61bb00d2c36a14a49698084b2a574dec3f074fc76bd804",
-      "installPath": "~/.agents/skills/godot-ui-control"
+      "installPath": "~/.agents/skills/godot-ui-control",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "grill-me",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "b31f9656e60cf9dd15b20ca3fdf5a900f343d5364d2840c9b139f79af69cabb8",
-      "installPath": "~/.agents/skills/grill-me"
+      "installPath": "~/.agents/skills/grill-me",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "grill-with-docs",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "84b20677d329c346c15023c4eb4bab1d1dc777d66ab4fcb962ce52ced253c301",
-      "installPath": "~/.agents/skills/grill-with-docs"
+      "installPath": "~/.agents/skills/grill-with-docs",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "grilling",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "5f9a70e4cb04c0f308ba3da4917a7d377142834fdf883bb49f4dfab5f6098b74",
-      "installPath": "~/.agents/skills/grilling"
+      "installPath": "~/.agents/skills/grilling",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "handoff",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "b18e27803864a87fb2b66b3651c226481d7617581311c888f809cf55e0d81a57",
-      "installPath": "~/.agents/skills/handoff"
+      "installPath": "~/.agents/skills/handoff",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "html-report",
       "source": "local",
       "treeSha256": "af1cc7d3abd2719b680547d46d9ab632d97663f8d413bd4390c25f344278bf59",
-      "installPath": "~/.agents/skills/html-report"
+      "installPath": "~/.agents/skills/html-report",
+      "profiles": [
+        "core"
+      ]
+    },
+    {
+      "name": "impeccable",
+      "source": "https://github.com/pbakaus/impeccable",
+      "sourceRevision": "b49177d32788f2dc585c42831d845dacf1ebed2c",
+      "treeSha256": "bd08dcd4084a53cf3233f68395274bb09dc3616e857c05f306f98f4bc50dff9b",
+      "installPath": "~/.agents/skills/impeccable",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "implement",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
       "treeSha256": "bdb3e4ef5b1e979546f04411e8e20083620bbf3335457d5d89151a042d5a9549",
-      "installPath": "~/.agents/skills/implement"
+      "installPath": "~/.agents/skills/implement",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "improve-codebase-architecture",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "b1736ac87de7ad33d093eacdb13194357322fa1a8823d90bdf3c35d0100f7f03",
-      "installPath": "~/.agents/skills/improve-codebase-architecture"
+      "installPath": "~/.agents/skills/improve-codebase-architecture",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "input-systems",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "c6166806b87c138ce0cf5e4a37bb55df8ff1ce4ddb726e7fb2542f85bc66d820",
-      "installPath": "~/.agents/skills/input-systems"
+      "installPath": "~/.agents/skills/input-systems",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "oci-servers",
       "source": "local",
       "treeSha256": "de15a6aed943269f668d92067ff0da673bcb07730c9914e5e4c5733f31deed27",
-      "installPath": "~/.agents/skills/oci-servers"
+      "installPath": "~/.agents/skills/oci-servers",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "orca-cli",
       "source": "https://github.com/stablyai/orca",
       "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
       "treeSha256": "2edff6af6fac216a2d6ff7f5a5575bfa59332ba5a7236e68f19225a9121479db",
-      "installPath": "~/.agents/skills/orca-cli"
+      "installPath": "~/.agents/skills/orca-cli",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "orchestration",
       "source": "https://github.com/stablyai/orca",
       "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
       "treeSha256": "3f6abcf68d8df39f7b66ca06e3f045b214df2e5b0b467b07f11c07b5359981d2",
-      "installPath": "~/.agents/skills/orchestration"
+      "installPath": "~/.agents/skills/orchestration",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "performance-optimization",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "d114adfa7fd4defc0b6e2172e2e24c642d196cfb67656020540970b601d56c03",
-      "installPath": "~/.agents/skills/performance-optimization"
+      "installPath": "~/.agents/skills/performance-optimization",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "ponytail",
       "source": "https://github.com/DietrichGebert/ponytail",
       "sourceRevision": "9cc65d03aa2da1db7121b912d03596409ee340b8",
       "treeSha256": "1e88b02f0419bf88fdd1d17c89735cc17db167b8a14a7aa7ed7f017cfa2a1baa",
-      "installPath": "~/.agents/skills/ponytail"
+      "installPath": "~/.agents/skills/ponytail",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "prototype",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "b5e661746ab32d6ec8c1f6743399af598935c839979ab03c86efa3aa82ce8dfb",
-      "installPath": "~/.agents/skills/prototype"
+      "installPath": "~/.agents/skills/prototype",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "research",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "95b2d283ed0063f736db62e67392699a718036cbc30eacea1fe5a51cbe7e89b8",
-      "installPath": "~/.agents/skills/research"
+      "installPath": "~/.agents/skills/research",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "resolving-merge-conflicts",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
       "treeSha256": "dcd0a75efc3edb0ce26cd68b35a70d7d9a6dd5044e476f3744a36ff8827ef69a",
-      "installPath": "~/.agents/skills/resolving-merge-conflicts"
+      "installPath": "~/.agents/skills/resolving-merge-conflicts",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "reverse-engineer-anything",
       "source": "https://github.com/morluto/rea",
       "sourceRevision": "a56f7bb668ab23fec8d33f7af353ac7ed2fe1895",
       "treeSha256": "c21a967807e4301ef2bcbef958307a14b2d10ff1ec9ddd96143f2eaa1eea1dba",
-      "installPath": "~/.agents/skills/reverse-engineer-anything"
+      "installPath": "~/.agents/skills/reverse-engineer-anything",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "router",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "f35fc2c8ccb1c77e9b7c03149f6aad889ed035224cfd90f8d8da3eae3f0311fd",
-      "installPath": "~/.agents/skills/router"
+      "treeSha256": "dd1dae6a6fe89d9ffa8c855cb3f1178c4f3ae3d018a40d4ef1b905332e99bbe2",
+      "installPath": "~/.agents/skills/router",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "save-systems",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
       "treeSha256": "5851486f6a3b0f22e9c7b03197c7ab238386e73f27dc18e0bf1dbb7cdf105fe0",
-      "installPath": "~/.agents/skills/save-systems"
+      "installPath": "~/.agents/skills/save-systems",
+      "profiles": [
+        "gamedev"
+      ]
     },
     {
       "name": "setup-matt-pocock-skills",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "7675b864dfab694f658c4e8da43d8f2ae6ee163af11c5e3cc873b577e9ca5e6c",
-      "installPath": "~/.agents/skills/setup-matt-pocock-skills"
+      "installPath": "~/.agents/skills/setup-matt-pocock-skills",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "starter-kit",
       "source": "local",
       "treeSha256": "06bea3d1900c9fb1674d0222b9353ce518f510c56f0e71a064e1f810537ddaae",
-      "installPath": "~/.agents/skills/starter-kit"
+      "installPath": "~/.agents/skills/starter-kit",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "tdd",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "7e147beeb2b096c4164228d60d5e8338cf0a2d880781e4568df8fefa3a10a9b9",
-      "installPath": "~/.agents/skills/tdd"
+      "installPath": "~/.agents/skills/tdd",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "teach",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "25647609adbf3c8ce4a87e3f88d4ac63c75c862bd8fdcd9c7da3d23cd10035ae",
-      "installPath": "~/.agents/skills/teach"
+      "installPath": "~/.agents/skills/teach",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "to-spec",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "07dd565b1c4e95e7132bfd5a3436320dce0a6a46f167f76fd5674ba9da6f9192",
-      "installPath": "~/.agents/skills/to-spec"
+      "installPath": "~/.agents/skills/to-spec",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "to-tickets",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "820254fa9a8f36fb3018fa651d4d60a6eec385081a3bd07aecbb89d92d109c43",
-      "installPath": "~/.agents/skills/to-tickets"
+      "installPath": "~/.agents/skills/to-tickets",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "triage",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "a699caccdf79880d5a8c5638734fd64443f931763c45c7fcb18b3bb6bca34c6c",
-      "installPath": "~/.agents/skills/triage"
+      "installPath": "~/.agents/skills/triage",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "unslop",
       "source": "https://github.com/heydamir/unslop",
       "sourceRevision": "620163eedb3529d9cd23a3994ed8d287d06f760d",
       "treeSha256": "7927404572edab3d8199694deb1c62a9c6af3a95c568503b03eb2117a8d931af",
-      "installPath": "~/.agents/skills/unslop"
+      "installPath": "~/.agents/skills/unslop",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "wayfinder",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "24fe0ef7737efae15c87225755e9f6f5965e4888",
       "treeSha256": "782065efe35bcbe2a19ca0be30a26732af25d5076c9bc22beaab80ef8fde045c",
-      "installPath": "~/.agents/skills/wayfinder"
+      "installPath": "~/.agents/skills/wayfinder",
+      "profiles": [
+        "core"
+      ]
     },
     {
       "name": "writing-great-skills",
       "source": "https://github.com/mattpocock/skills",
       "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
       "treeSha256": "63c1761b0d0042bc3a42b2afee6b3b2433452cf2144d6080c1240530f79e9d92",
-      "installPath": "~/.agents/skills/writing-great-skills"
+      "installPath": "~/.agents/skills/writing-great-skills",
+      "profiles": [
+        "core"
+      ]
     }
-  ]
+  ],
+  "guardPolicy": {
+    "claude": "off",
+    "codex": "deny",
+    "cursor": "deny",
+    "antigravity": "ask"
+  }
 }

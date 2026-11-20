@@ -2,7 +2,6 @@
 set -uo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-MANIFEST="$ROOT/manifest.json"
 HOOK="$HOME/.agents/hooks/guard-destructive.sh"
 failures=0
 OFFLINE=false
@@ -25,45 +24,7 @@ sha256() {
 
 file_sha() { sha256 "$1" | awk '{print $1}'; }
 
-tree_sha() {
-  local dir=$1
-  { cd "$dir" || exit 1; while IFS= read -r file; do printf '%s\n' "$file"; file_sha "$file"; done < <(find . -type f | LC_ALL=C sort); } | sha256 | awk '{print $1}'
-}
-
 same_file() { [[ -f "$1" && -f "$2" && "$(file_sha "$1")" == "$(file_sha "$2")" ]]; }
-
-# ---- skills ---------------------------------------------------------------------------------
-SKILL_LIST=$(jq -r '.skills[].name' "$MANIFEST" | LC_ALL=C sort)
-VENDORED_LIST=$(cd "$ROOT/skills/shared" && find . -mindepth 1 -maxdepth 1 -type d | sed 's|^\./||' | LC_ALL=C sort)
-[[ "$SKILL_LIST" == "$VENDORED_LIST" ]] \
-  && pass 'manifest matches vendored skills/shared' || fail 'manifest matches vendored skills/shared'
-
-SKILLS=()
-while IFS= read -r name; do SKILLS+=("$name"); done <<<"$SKILL_LIST"
-
-agy_skills=()
-if has_agy; then agy_skills=("$HOME/.gemini/config/skills"); fi
-unmanaged=$(LC_ALL=C comm -23 \
-  <(find "$HOME/.agents/skills" "$HOME/.claude/skills" "${agy_skills[@]}" -mindepth 1 -maxdepth 1 2>/dev/null | sed 's|.*/||' | grep -v '^synced$' | LC_ALL=C sort -u) \
-  <(printf '%s\n' "$SKILL_LIST"))
-if [[ -n "$unmanaged" ]]; then
-  printf 'INFO  unmanaged skills preserved: %s\n' "$(tr '\n' ' ' <<<"$unmanaged")"
-else
-  pass 'no unmanaged skills installed'
-fi
-
-for name in "${SKILLS[@]}"; do
-  canonical="$HOME/.agents/skills/$name"
-  claude_link="$HOME/.claude/skills/$name"
-  expected=$(jq -r --arg name "$name" '.skills[] | select(.name == $name) | .treeSha256' "$MANIFEST")
-  [[ -f "$canonical/SKILL.md" ]] && pass "$name canonical skill exists" || fail "$name canonical skill exists"
-  [[ -d "$canonical" && "$(tree_sha "$canonical")" == "$expected" ]] && pass "$name pinned tree checksum" || fail "$name pinned tree checksum"
-  [[ -L "$claude_link" && "$(readlink "$claude_link")" == "$canonical" ]] && pass "$name Claude symlink" || fail "$name Claude symlink"
-  if has_agy; then
-    agy_link="$HOME/.gemini/config/skills/$name"
-    [[ -L "$agy_link" && "$(readlink "$agy_link")" == "$canonical" ]] && pass "$name Antigravity symlink" || fail "$name Antigravity symlink"
-  fi
-done
 
 # ---- shared instructions ------------------------------------------------------------------
 shared="$HOME/.agents/AGENTS.md"
@@ -113,22 +74,6 @@ jq -e '.decision == "ask"' <<<"$(hook_out '--decision ask' "$sample_agy")" >/dev
 jq -e '.decision == "allow"' <<<"$(hook_out '--decision ask' "$sample_agy_plain")" >/dev/null 2>&1 \
   && pass 'guard hook allows on git status (Antigravity)' || fail 'guard hook allows on git status (Antigravity)'
 
-count_pretooluse() {
-  jq '[.hooks.PreToolUse[]? | select([.hooks[]?.command // ""] | any(contains("guard-destructive.sh")))] | length' "$1" 2>/dev/null
-}
-[[ "$(count_pretooluse "$HOME/.claude/settings.json")" == 0 ]] \
-  && pass 'Claude Code settings have no destructive-command guard' || fail 'Claude Code settings have no destructive-command guard'
-[[ "$(count_pretooluse "$HOME/.codex/hooks.json")" == 1 ]] \
-  && pass 'guard hook registered once in Codex hooks.json' || fail 'guard hook registered once in Codex hooks.json'
-if has_cursor; then
-  n=$(jq '[.hooks.beforeShellExecution[]? | select((.command // "") | contains("guard-destructive.sh"))] | length' "$HOME/.cursor/hooks.json" 2>/dev/null)
-  [[ "$n" == 1 ]] && pass 'guard hook registered once in Cursor hooks.json' || fail 'guard hook registered once in Cursor hooks.json'
-fi
-if has_agy; then
-  count_agy=$(jq '[.["guard-destructive"].PreToolUse[]? | .hooks[]? | select((.command // "") | contains("guard-destructive.sh"))] | length' "$HOME/.gemini/config/hooks.json" 2>/dev/null)
-  [[ "$count_agy" == 1 ]] && pass 'guard hook registered once in Antigravity hooks.json' || fail 'guard hook registered once in Antigravity hooks.json'
-fi
-
 # ---- verifier subagent ---------------------------------------------------------------------
 same_file "$HOME/.claude/agents/verifier.md" "$ROOT/agents/verifier.md" \
   && pass 'verifier subagent installed for Claude Code' || fail 'verifier subagent installed for Claude Code'
@@ -141,7 +86,7 @@ if has_agy; then
 fi
 
 # ---- MCP servers ---------------------------------------------------------------------------
-check 'local configuration values and skill discovery' python3 "$ROOT/scripts/check-config.py"
+check 'local configuration values and skill discovery' python3 -B "$ROOT/scripts/check-config.py" --installed --check-readme
 while IFS=$'\t' read -r server settings; do
   [[ -n "$server" ]] || continue
   if ! $OFFLINE && command -v claude >/dev/null 2>&1; then

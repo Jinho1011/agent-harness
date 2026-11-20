@@ -12,12 +12,18 @@ PREVIOUS="$STATE/installed-manifest.json"
 KEEP_BACKUPS=${AGENT_HARNESS_KEEP_BACKUPS-10}
 [[ "$KEEP_BACKUPS" =~ ^[1-9][0-9]*$ ]] || { echo 'AGENT_HARNESS_KEEP_BACKUPS must be a positive integer' >&2; exit 1; }
 DRY_RUN=false
-case "${1:-}" in
-  --dry-run) DRY_RUN=true ;;
-  '') ;;
-  *) echo 'usage: install.sh [--dry-run]' >&2; exit 1 ;;
-esac
-[[ $# -le 1 ]] || { echo 'usage: install.sh [--dry-run]' >&2; exit 1; }
+PROFILE_ARGS=()
+while (( $# )); do
+  case "$1" in
+    --dry-run) DRY_RUN=true ;;
+    --profiles)
+      [[ $# -ge 2 ]] || { echo '--profiles requires all or a comma-separated list' >&2; exit 1; }
+      PROFILE_ARGS=("$2")
+      shift ;;
+    *) echo 'usage: install.sh [--dry-run] [--profiles <csv|all>]' >&2; exit 1 ;;
+  esac
+  shift
+done
 
 for command_name in jq git python3; do
   command -v "$command_name" >/dev/null || { echo "missing dependency: $command_name" >&2; exit 1; }
@@ -51,30 +57,23 @@ backup_target() {
   fi
 }
 
-SKILL_LIST=$(jq -r '.skills[].name' "$MANIFEST" | LC_ALL=C sort)
-VENDORED_LIST=$(cd "$ROOT/skills/shared" && find . -mindepth 1 -maxdepth 1 -type d | sed 's|^\./||' | LC_ALL=C sort)
-if [[ "$SKILL_LIST" != "$VENDORED_LIST" ]]; then
-  echo "manifest.json and skills/shared/ disagree; run scripts/sync-manifest.sh" >&2
-  diff <(printf '%s\n' "$SKILL_LIST") <(printf '%s\n' "$VENDORED_LIST") >&2 || true
-  exit 1
-fi
-[[ -n "$SKILL_LIST" ]] || { echo "manifest contains no skills" >&2; exit 1; }
-
-SKILLS=()
-while IFS= read -r name; do SKILLS+=("$name"); done <<<"$SKILL_LIST"
-for name in "${SKILLS[@]}"; do
-  [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ && -f "$ROOT/skills/shared/$name/SKILL.md" ]] || { echo "invalid vendored skill: $name" >&2; exit 1; }
-done
-python3 "$ROOT/scripts/check-config.py" --source >/dev/null || {
+python3 -B "$ROOT/scripts/check-config.py" --source >/dev/null || {
   echo 'source/configuration validation failed; run python3 scripts/check-config.py --source' >&2
   exit 1
 }
+selected=$(python3 -B "$ROOT/scripts/harness_manifest.py" select "$PREVIOUS" "${PROFILE_ARGS[@]+"${PROFILE_ARGS[@]}"}")
+SKILL_LIST=$(jq -r '.skills[].name' <<<"$selected")
+SKILLS=()
+while IFS= read -r name; do
+  [[ -z "$name" ]] || SKILLS+=("$name")
+done <<<"$SKILL_LIST"
 removed_mcp='[]'
 REMOVED=()
 if [[ -f "$PREVIOUS" ]]; then
   removed_mcp=$(jq -c --slurpfile current "$ROOT/mcp.json" '((.mcpServers // {}) | keys) - ($current[0].servers | keys)' "$PREVIOUS")
-  previous_names=$(jq -er '.skills | map(.name) | .[]' "$PREVIOUS")
+  previous_names=$(jq -r '.skills | map(.name) | .[]' "$PREVIOUS")
   while IFS= read -r name; do
+    [[ -n "$name" ]] || continue
     [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo 'invalid previous skill name' >&2; exit 1; }
     if ! printf '%s\n' "$SKILL_LIST" | grep -Fxq -- "$name"; then REMOVED+=("$name"); fi
   done <<<"$previous_names"
@@ -119,12 +118,12 @@ if has_agy; then
   backup_target "$HOME/.gemini/config/hooks.json"
   backup_target "$HOME/.gemini/config/mcp_config.json"
   backup_target "$HOME/.gemini/config/agents/verifier/agent.md"
-  for name in "${SKILLS[@]}"; do
+  for name in "${SKILLS[@]+"${SKILLS[@]}"}"; do
     backup_target "$HOME/.gemini/config/skills/$name"
   done
 fi
 
-for name in "${SKILLS[@]}"; do
+for name in "${SKILLS[@]+"${SKILLS[@]}"}"; do
   [[ -f "$ROOT/skills/shared/$name/SKILL.md" ]] || { echo "missing vendored skill: $name" >&2; exit 1; }
   backup_target "$HOME/.agents/skills/$name"
   backup_target "$HOME/.claude/skills/$name"
@@ -188,7 +187,7 @@ if has_agy; then
 fi
 
 # ---- skills ---------------------------------------------------------------------------------
-for name in "${SKILLS[@]}"; do
+for name in "${SKILLS[@]+"${SKILLS[@]}"}"; do
   canonical="$HOME/.agents/skills/$name"
   claude_link="$HOME/.claude/skills/$name"
   rm -rf -- "$canonical"
@@ -222,66 +221,7 @@ write_json() {
   mv "$tmp" "$file"
 }
 
-# Claude Code and Codex share the PreToolUse shape; Codex has no "ask" yet, so it gets "deny".
-register_pretooluse() {
-  local file=$1 decision=$2
-  [[ -f "$file" ]] || printf '{}\n' >"$file"
-  jq --arg command "$HOOK --decision $decision" '
-    .hooks = (.hooks // {}) |
-    (.hooks.PreToolUse // []) as $groups |
-    ([$groups | to_entries[] |
-      select([.value.hooks[]?.command // ""] | any(contains("guard-destructive.sh"))) |
-      .key][0] // ($groups | length)) as $slot |
-    .hooks.PreToolUse = ([
-      $groups[] |
-      .hooks = [.hooks[]? | select(((.command // "") | contains("guard-destructive.sh")) | not)] |
-      select(.hooks | length > 0)
-    ] | .[:$slot] + [{matcher:"Bash", hooks:[{type:"command", command:$command}]}] + .[$slot:])
-  ' "$file" | write_json "$file"
-}
-# Claude Code follows the user's autonomous execution policy; remove legacy guard hooks.
-[[ -f "$HOME/.claude/settings.json" ]] || printf '{}\n' >"$HOME/.claude/settings.json"
-jq '
-  if .hooks.PreToolUse then
-    .hooks.PreToolUse |= map(
-      .hooks |= map(select(((.command // "") | contains("guard-destructive.sh")) | not)) |
-      select(.hooks | length > 0)
-    )
-  else . end
-' "$HOME/.claude/settings.json" | write_json "$HOME/.claude/settings.json"
-register_pretooluse "$HOME/.codex/hooks.json" deny
-
-if has_cursor; then
-  mkdir -p "$HOME/.cursor"
-  [[ -f "$HOME/.cursor/hooks.json" ]] || printf '{"version":1,"hooks":{}}\n' >"$HOME/.cursor/hooks.json"
-  # Cursor auto-allows "ask" under --yolo and in non-interactive runs, so it gets "deny" too.
-  jq --arg command "$HOOK --decision deny" '
-    .version = (.version // 1) | .hooks = (.hooks // {}) |
-    .hooks.beforeShellExecution = ([
-      (.hooks.beforeShellExecution // [])[] |
-      select(((.command // "") | contains("guard-destructive.sh")) | not)
-    ] + [{command:$command, timeout:10}])
-  ' "$HOME/.cursor/hooks.json" | write_json "$HOME/.cursor/hooks.json"
-fi
-if has_agy; then
-  mkdir -p "$HOME/.gemini/config"
-  [[ -f "$HOME/.gemini/config/hooks.json" ]] || printf '{}\n' >"$HOME/.gemini/config/hooks.json"
-  jq --arg command "$HOOK --decision ask" '
-    .["guard-destructive"] = {
-      "PreToolUse": [
-        {
-          "matcher": "run_command",
-          "hooks": [
-            {
-              "type": "command",
-              "command": $command
-            }
-          ]
-        }
-      ]
-    }
-  ' "$HOME/.gemini/config/hooks.json" | write_json "$HOME/.gemini/config/hooks.json"
-fi
+python3 -B "$ROOT/scripts/guard_config.py"
 
 # ---- verifier subagent ---------------------------------------------------------------------
 # Claude Code and Cursor read the markdown definition; Codex needs a TOML rendering of it.
@@ -353,7 +293,7 @@ fi
 
 printf '%s\n' "$BACKUP" >"$STATE/latest-backup"
 printf '%s\n' "$ROOT" >"$STATE/root"
-jq --slurpfile current "$ROOT/mcp.json" '.mcpServers = $current[0].servers' "$MANIFEST" | write_json "$PREVIOUS"
+jq --slurpfile current "$ROOT/mcp.json" '.mcpServers = $current[0].servers' <<<"$selected" | write_json "$PREVIOUS"
 python3 - "$BACKUP" "$KEEP_BACKUPS" <<'PYTHON'
 from pathlib import Path
 import shutil
@@ -367,6 +307,6 @@ for backup in older[int(sys.argv[2]) - 1:]:
 PYTHON
 echo "Installed shared harness. Backup: $BACKUP"
 echo "Run: $ROOT/scripts/doctor.sh"
-if command -v codex >/dev/null 2>&1; then
+if command -v codex >/dev/null 2>&1 && jq -e '.guardPolicy.codex != "off"' "$MANIFEST" >/dev/null; then
   echo "Codex: run /hooks inside codex once on this machine to trust the guard hook."
 fi

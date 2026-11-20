@@ -36,7 +36,7 @@ class InstallTests(unittest.TestCase):
         self.repo.mkdir()
         for name in ['scripts', 'hooks', 'agents']:
             shutil.copytree(ROOT / name, self.repo / name)
-        for name in ['AGENTS.md', 'mcp.json']:
+        for name in ['AGENTS.md', 'README.md', 'mcp.json', 'mcp-optional.json']:
             shutil.copyfile(ROOT / name, self.repo / name)
         skills = []
         for name in ['alpha', 'beta']:
@@ -45,8 +45,10 @@ class InstallTests(unittest.TestCase):
             content = f'---\nname: {name}\ndescription: Test skill\n---\nTest.\n'
             (path / 'SKILL.md').write_text(content)
             digest = hashlib.sha256(('./SKILL.md\n' + hashlib.sha256(content.encode()).hexdigest() + '\n').encode()).hexdigest()
-            skills.append({'name': name, 'treeSha256': digest})
-        (self.repo / 'manifest.json').write_text(json.dumps({'skills': skills}))
+            skills.append({'name': name, 'treeSha256': digest, 'source': 'local',
+                           'profiles': ['core' if name == 'alpha' else 'gamedev']})
+        (self.repo / 'manifest.json').write_text(json.dumps({
+            'schemaVersion': 3, 'skills': skills, 'guardPolicy': json.loads((ROOT / 'manifest.json').read_text())['guardPolicy']}))
         self.bin = base / 'bin'
         self.bin.mkdir()
         stub = '''#!/usr/bin/env python3
@@ -73,6 +75,8 @@ if args[:2]==['mcp','add-json']:
         self.env = dict(os.environ, HOME=str(self.home), PATH=str(self.bin) + os.pathsep + os.environ['PATH'], PYTHONDONTWRITEBYTECODE='1')
         for key in ['CLAUDE_CONFIG_DIR', 'CODEX_HOME']:
             self.env.pop(key, None)
+
+        self.run_script('sync-manifest.sh')
 
     def run_script(self, name, *args, success=True):
         result = subprocess.run(['bash', str(self.repo / 'scripts' / name), *map(str, args)],
@@ -131,6 +135,7 @@ if args[:2]==['mcp','add-json']:
         data['skills'] = data['skills'][:1]
         manifest.write_text(json.dumps(data))
         shutil.rmtree(self.repo / 'skills/shared/beta')
+        self.run_script('sync-manifest.sh')
         before = snapshot(self.home)
         preview = self.run_script('install.sh', '--dry-run')
         self.assertIn('REMOVE previously managed', preview.stdout)
@@ -191,6 +196,7 @@ if args[:2]==['mcp','add-json']:
         servers['blender'].update(args=['serve', 'new'], env={'NEW': 'enabled'})
         servers['context7']['url'] = 'https://example.test/new'
         source.write_text(json.dumps({'servers': servers}))
+        self.run_script('sync-manifest.sh')
         self.run_script('install.sh')
         self.run_script('doctor.sh', '--offline')
         self.assertEqual(tomllib.loads((self.home / '.codex/config.toml').read_text())['mcp_servers'], servers)
@@ -263,6 +269,7 @@ if args[:2]==['mcp','add-json']:
         mcp = json.loads((self.repo / 'mcp.json').read_text())
         mcp['servers']['fixture'] = expected
         (self.repo / 'mcp.json').write_text(json.dumps(mcp))
+        self.run_script('sync-manifest.sh')
         self.write_json('.cursor/mcp.json', {'mcpServers': {'personal': {'command': 'keep-me'}}})
         self.run_script('install.sh')
         config = tomllib.loads((self.home / '.codex/config.toml').read_text())
@@ -284,6 +291,130 @@ if args[:2]==['mcp','add-json']:
             result = self.run_script('doctor.sh', '--offline', success=False)
             self.assertIn('FAIL  ' + label, result.stdout + result.stderr)
             path.write_text(original)
+
+
+    def test_profile_switch_restore_and_v2_migration(self):
+        state = self.home / '.local/state/agent-harness/installed-manifest.json'
+        self.run_script('install.sh')
+        current = json.loads(state.read_text())
+        self.assertEqual(current.pop('selectedProfiles'), 'all')
+        current['schemaVersion'] = 2
+        state.write_text(json.dumps(current))
+        self.run_script('doctor.sh', '--offline')
+        self.run_script('install.sh')
+        self.assertEqual(json.loads(state.read_text())['selectedProfiles'], 'all')
+        personal = self.home / '.agents/skills/personal'
+        personal.mkdir()
+        before = snapshot(self.home)
+        for args in [('--profiles', 'core', '--dry-run'), ('--dry-run', '--profiles', 'core')]:
+            out = self.run_script('install.sh', *args).stdout
+            self.assertIn('REMOVE previously managed ' + str(personal.parent / 'beta'), out)
+            self.assertEqual(snapshot(self.home), before)
+        self.run_script('install.sh', '--profiles', 'core')
+        backup = state.with_name('latest-backup').read_text().strip()
+        for _ in range(2):
+            data = json.loads(state.read_text())
+            self.assertEqual(data['selectedProfiles'], ['core'])
+            self.assertEqual([s['name'] for s in data['skills']], ['alpha'])
+            for base in ['.agents/skills', '.claude/skills', '.gemini/config/skills']:
+                self.assertFalse(os.path.lexists(self.home / base / 'beta'))
+            self.assertTrue(personal.is_dir())
+            self.run_script('doctor.sh', '--offline')
+            self.run_script('install.sh')
+        self.run_script('restore.sh', backup)
+        self.assertEqual(json.loads(state.read_text())['selectedProfiles'], 'all')
+        self.run_script('doctor.sh', '--offline')
+        self.run_script('install.sh', '--profiles', 'core')
+        self.run_script('install.sh', '--profiles', 'all')
+        self.assertTrue((self.home / '.agents/skills/beta/SKILL.md').is_file())
+        self.assertTrue(personal.is_dir())
+        (self.repo / 'skills/shared/beta/SKILL.md').write_text('unselected drift')
+        before = snapshot(self.home)
+        self.run_script('install.sh', '--profiles', 'core', success=False)
+        self.assertEqual(snapshot(self.home), before)
+
+    def test_skill_failures_accumulate(self):
+        self.run_script('install.sh')
+        alpha = self.home / '.agents/skills/alpha/SKILL.md'
+        alpha.unlink()
+        beta = self.home / '.agents/skills/beta/SKILL.md'
+        beta.write_text(beta.read_text().replace('name:', 'disable-model-invocation: true\nname:'))
+        link = self.home / '.claude/skills/beta'
+        link.unlink()
+        link.symlink_to(alpha.parent)
+        output = self.run_script('doctor.sh', '--offline', success=False).stdout
+        for label in ['alpha canonical skill exists', 'beta pinned tree checksum',
+                      'beta automatic/manual discovery', 'beta Claude symlink']:
+            self.assertIn('FAIL  ' + label, output)
+
+    def test_guard_modes_preserve_unrelated_hooks(self):
+        manifest = self.repo / 'manifest.json'
+        data = json.loads(manifest.read_text())
+        data['guardPolicy'].update(claude='ask', codex='off', cursor='off', antigravity='deny')
+        manifest.write_text(json.dumps(data))
+        self.run_script('sync-manifest.sh')
+        kept = {'command': 'personal'}
+        old = {'command': '/old/guard-destructive.sh'}
+        self.write_json('.cursor/hooks.json', {'hooks': {'beforeShellExecution': [kept, old]}})
+        agy = self.write_json('.gemini/config/hooks.json', {'guard-destructive': {
+            'PreToolUse': [{'matcher': 'run_command', 'hooks': [old, kept, old]}]}})
+        self.run_script('install.sh')
+        initial = agy.read_bytes()
+        self.run_script('install.sh')
+        self.assertEqual(agy.read_bytes(), initial)
+        self.assertEqual(json.loads((self.home / '.cursor/hooks.json').read_bytes())['hooks']['beforeShellExecution'], [kept])
+        self.assertIn(kept, [h for g in json.loads(initial)['guard-destructive']['PreToolUse'] for h in g['hooks']])
+        self.run_script('doctor.sh', '--offline')
+        for replacement in ('--decision ask', '--decision deny --extra'):
+            agy.write_bytes(initial.replace(b'--decision deny', replacement.encode()))
+            self.assertIn('FAIL  antigravity guard policy (deny)', self.run_script('doctor.sh', '--offline', success=False).stdout)
+        agy.write_bytes(initial.replace(b'/.agents/hooks/', b'/wrong/'))
+        self.assertIn('FAIL  antigravity guard policy (deny)', self.run_script('doctor.sh', '--offline', success=False).stdout)
+
+    def test_readme_drift_and_marker_validation(self):
+        def verify():
+            return subprocess.run(['python3', str(self.repo / 'scripts/check-config.py'), '--check-readme'],
+                                  env=self.env, text=True, capture_output=True)
+        p = self.repo / 'README.md'
+        original = p.read_text()
+        mtime = p.stat().st_mtime_ns
+        self.run_script('sync-manifest.sh')
+        self.assertEqual(p.stat().st_mtime_ns, mtime)
+        self.assertEqual(verify().returncode, 0)
+        p.write_text(original.replace('| alpha |', '| stale |') + 'Personal paragraph.\n')
+        result = verify()
+        self.assertEqual(result.returncode, 1)
+        for token in ['SKILLS_TABLE', '-| stale |', '+| alpha |', './scripts/sync-manifest.sh']:
+            self.assertIn(token, result.stdout)
+        self.run_script('sync-manifest.sh')
+        self.assertEqual(p.read_text(), original + 'Personal paragraph.\n')
+        marker = '<!-- BEGIN:MCP_TABLE -->'
+        for damaged in ['', marker + '\n' + marker, '<!-- END:MCP_TABLE -->']:
+            p.write_text(original.replace(marker, damaged))
+            before = snapshot(self.repo)
+            self.run_script('sync-manifest.sh', success=False)
+            self.assertEqual(snapshot(self.repo), before)
+            self.assertEqual(verify().returncode, 1)
+
+    def test_sync_validates_profiles_and_preserves_metadata(self):
+        manifest = self.repo / 'manifest.json'
+        data = json.loads(manifest.read_text())
+        for tags in [[], ['all'], ['extra'], ['core', 'core'], 'core', ['']]:
+            data['skills'][0]['profiles'] = tags
+            manifest.write_text(json.dumps(data))
+            before = snapshot(self.repo)
+            self.run_script('sync-manifest.sh', success=False)
+            self.assertEqual(snapshot(self.repo), before)
+        data['skills'][0].update(profiles=['gamedev', 'core'], sourceRevision='pinned')
+        manifest.write_text(json.dumps(data))
+        shutil.copytree(self.repo / 'skills/shared/alpha', self.repo / 'skills/shared/new')
+        self.run_script('sync-manifest.sh')
+        skills = json.loads(manifest.read_text())['skills']
+        self.assertEqual(skills[0], data['skills'][0])
+        self.assertEqual(skills[-1]['profiles'], ['core'])
+        self.run_script('install.sh', '--profiles', 'core,gamedev')
+        for value in ['core,', 'core,core', 'all,core', 'unknown']:
+            self.run_script('install.sh', '--profiles', value, success=False)
 
 
 class GuardTests(unittest.TestCase):

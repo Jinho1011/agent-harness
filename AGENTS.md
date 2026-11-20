@@ -46,6 +46,7 @@ works, style.
 - Within the user's requested scope, proceed autonomously with necessary actions, including
   deleting files or branches, rewriting history, force pushes, and changing remote or production
   state, without asking for confirmation again. Ask when the scope or intent is unclear.
+- An enabled `guard-destructive.sh` may require explicit confirmation (`CONFIRMED=1`) even within scope.
 
 ## Context
 

@@ -188,8 +188,8 @@ For the exhaustive per-skill trigger list and every engine binding, read
 
 1. **Preloaded:** only each skill's `name` + `description` are in context. Decide from those plus
    the fingerprint — do **not** pre-read bodies.
-2. **On selection:** read the body of **each chosen** `skills/<category>/<name>/SKILL.md` — and
-   only those. Never bulk-load a whole category.
+2. **On selection:** open only installed targets. Read `~/.agents/skills/<name>/SKILL.md` for each
+   chosen skill that exists there. Never bulk-load a whole category.
 3. **On demand:** read a skill's bundled `references/` files only when the subtask needs that
    depth (the skill body says when).
 4. **Re-route on pivot:** if the task changes (movement → saving), select and read the newly

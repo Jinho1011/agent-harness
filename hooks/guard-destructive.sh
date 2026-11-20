@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 # agent-harness guard: destructive or outward-facing shell commands wait for explicit confirmation.
 #
-# Registered as a PreToolUse (Claude Code, Codex, Antigravity) or beforeShellExecution (Cursor) hook. Reads the
-# hook payload on stdin, and when the command matches a guarded pattern answers "ask" (Claude Code,
-# Cursor, Antigravity) or "deny" (Codex, which does not support "ask" yet). A command prefixed with CONFIRMED=1
-# is allowed through, which is how the agent re-runs a command after the user confirmed it.
+# Reads PreToolUse, beforeShellExecution and run_command payloads and applies the configured decision.
 #
 # Usage: guard-destructive.sh [--decision ask|deny]
 set -uo pipefail
