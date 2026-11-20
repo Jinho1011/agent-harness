@@ -6,6 +6,7 @@ description: >
   sync-to-beat playback timing. Use when playing sounds or music in a Godot project,
   routing AudioStreamPlayer nodes to buses, adjusting bus volume via AudioServer, or
   syncing gameplay to the beat.
+disable-model-invocation: true
 ---
 
 # Godot Audio (4.x)

@@ -7,6 +7,7 @@ description: >
   particle, and camera APIs. Use when the user mentions game feel, juice, "make it feel
   good/punchy", screen shake, hit stop, screen freeze, easing, squash and stretch, impact
   frames, or feedback/polish on hits, jumps, pickups, and deaths.
+disable-model-invocation: true
 ---
 
 # Game feel (juice)

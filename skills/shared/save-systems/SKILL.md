@@ -6,6 +6,7 @@ description: >
   autosave. Engine-neutral. Use when the user mentions save system, save/load,
   game state persistence, save slots, autosave, save file corruption, or
   migrating old saves to a new version.
+disable-model-invocation: true
 ---
 
 # Save systems

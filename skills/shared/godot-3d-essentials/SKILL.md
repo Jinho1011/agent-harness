@@ -6,6 +6,7 @@ description: >
   MeshInstance3D materials, and GridMap for tile-based 3D levels. Use when building
   a 3D scene in a Godot project, placing cameras/lights, configuring environment and
   post-processing, or working with Node3D/.tscn 3D content and GridMap.
+disable-model-invocation: true
 ---
 
 # Godot 3D Essentials (4.x)

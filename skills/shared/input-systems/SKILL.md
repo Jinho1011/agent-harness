@@ -7,6 +7,7 @@ description: >
   buffering and coyote time, plus accessibility. Engine-neutral. Use when the
   user mentions input mapping, rebind controls, gamepad support, deadzone, input
   buffering, coyote time, or accessible controls.
+disable-model-invocation: true
 ---
 
 # Input systems

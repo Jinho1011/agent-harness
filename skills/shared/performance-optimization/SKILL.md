@@ -7,6 +7,7 @@ description: >
   neutral method that pairs with each engine's profiler. Use when the user mentions performance,
   optimize, low/dropping FPS, frame drops, stutter, lag, profiler, frame budget, draw calls,
   batching, garbage collection/GC spikes, object pooling, or "the game runs slow".
+disable-model-invocation: true
 ---
 
 # Performance optimization

@@ -7,6 +7,7 @@ description: >
   camera node and rigs like Unity Cinemachine or Godot Camera2D/PhantomCamera. Use when the user
   mentions camera follow, follow camera, deadzone, look-ahead, camera smoothing, camera bounds/
   limits, third-person camera, orbit camera, first-person look, Cinemachine, or camera jitter.
+disable-model-invocation: true
 ---
 
 # Camera systems

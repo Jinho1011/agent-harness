@@ -1,6 +1,7 @@
 ---
 name: create-game-assets
 description: Plan, generate, source, normalize, and validate cohesive visual game assets. Use for art direction, style bibles, sprites, tilesets, backgrounds, UI art, icons, textures, concept art, or 3D asset briefs.
+disable-model-invocation: true
 ---
 
 # Create Game Assets

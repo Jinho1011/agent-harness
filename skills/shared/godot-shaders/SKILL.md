@@ -6,6 +6,7 @@ description: >
   hint_range), TIME/UV animation, and screen-reading via hint_screen_texture. Use
   when authoring .gdshader files, writing fragment/vertex code, making 2D/3D visual
   effects, or porting 3.x shaders (SCREEN_TEXTURE, hint_color) to 4.x.
+disable-model-invocation: true
 ---
 
 # Godot Shaders (4.x)

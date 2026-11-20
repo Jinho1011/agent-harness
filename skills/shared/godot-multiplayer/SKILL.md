@@ -7,6 +7,7 @@ description: >
   state with MultiplayerSpawner and MultiplayerSynchronizer. Use when adding
   multiplayer/networking to a Godot project, writing @rpc functions, or syncing
   player/world state across peers.
+disable-model-invocation: true
 ---
 
 # Godot Multiplayer (4.x high-level)

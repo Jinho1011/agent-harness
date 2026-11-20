@@ -7,6 +7,7 @@ description: >
   collision layers/masks, detecting overlaps with Area2D/Area3D, applying forces to a
   RigidBody, or casting rays in a Godot project (.tscn with physics bodies), including
   3D projects running Jolt Physics, the default 3D engine for projects created in 4.6+.
+disable-model-invocation: true
 ---
 
 # Godot Physics (4.x, 2D + 3D)

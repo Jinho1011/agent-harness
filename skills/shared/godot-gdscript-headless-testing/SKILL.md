@@ -7,6 +7,7 @@ description: >
   when wiring a CI job (GitHub Actions or similar) that must fail the build on a
   failing `.gd` test, or when a `godot --headless` invocation hangs, opens a
   window, or exits 0 despite failed assertions.
+disable-model-invocation: true
 ---
 
 # Godot GDScript headless testing (4.x)

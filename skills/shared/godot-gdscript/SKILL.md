@@ -6,6 +6,7 @@ description: >
   signals, and await for asynchronous flow. Use when editing .gd scripts in a
   Godot project (project.godot), writing or debugging GDScript, or porting 3.x
   GDScript to 4.x (function signatures, yield to await, export to @export).
+disable-model-invocation: true
 ---
 
 # Godot GDScript (4.x)

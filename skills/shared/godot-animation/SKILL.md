@@ -6,6 +6,7 @@ description: >
   character animation, and Tween for short procedural/UI tweens via create_tween().
   Use when working with AnimationPlayer/AnimationTree nodes in a .tscn, blending
   character states, sprite-sheet animation, or code-driven Tweens.
+disable-model-invocation: true
 ---
 
 # Godot Animation (4.x)

@@ -6,6 +6,7 @@ description: >
   and register autoload singletons. Use when designing .tscn scenes, deciding how
   to split nodes, spawning instances with instantiate(), wiring autoloads, or
   fixing "node not found"/freed-node errors in a Godot project.
+disable-model-invocation: true
 ---
 
 # Godot Nodes & Scenes (4.x)

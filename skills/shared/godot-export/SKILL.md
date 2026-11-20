@@ -6,6 +6,7 @@ description: >
   exports for CI, and handle web (HTML5) COOP/COEP and dedicated-server/headless
   builds. Use when exporting a Godot game, configuring export_presets.cfg, building
   for web/desktop/mobile, or automating builds from the command line.
+disable-model-invocation: true
 ---
 
 # Godot Export & Builds (4.x)

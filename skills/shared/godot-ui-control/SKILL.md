@@ -6,6 +6,7 @@ description: >
   arrangement, Theme resources for consistent styling, and keyboard/gamepad focus
   navigation. Use when laying out a HUD, menu, or UI in a Godot project, working
   with Control/Container nodes, anchors, themes, or focus in a .tscn.
+disable-model-invocation: true
 ---
 
 # Godot UI / Control nodes (4.x)

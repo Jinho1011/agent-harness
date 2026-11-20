@@ -7,6 +7,7 @@ description: >
   AI, an FSM or behavior tree, steering/flocking, or pathfinding, or when the
   user mentions state machine, behavior tree, blackboard, A*, navmesh, seek, or
   patrol/chase.
+disable-model-invocation: true
 ---
 
 # Game AI: decisions, steering, and pathfinding

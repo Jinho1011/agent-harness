@@ -6,6 +6,7 @@ description: >
   and broadcast to many nodes via groups and call_group. Use when wiring node
   communication in a Godot project, replacing tight references with signals,
   emitting/connecting events, or porting 3.x connect("sig", self, "method") code.
+disable-model-invocation: true
 ---
 
 # Godot Signals & Groups (4.x)
