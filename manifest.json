@@ -44,11 +44,12 @@
       "name": "browser-use",
       "source": "https://github.com/browser-use/browser-use",
       "sourceRevision": "753d629d76eb2b670f4cf467f3355bbe750f6845",
-      "treeSha256": "87fc05bef6da14f837d0bbb1057d047cad0e511168480ddfc1435eb92847d37a",
+      "treeSha256": "0c9e63c7c00dd0fce64bad83955b6400d78e4b8fd34f4330da90197c31f6d53c",
       "installPath": "~/.agents/skills/browser-use",
       "profiles": [
         "core"
-      ]
+      ],
+      "note": "Local patch: removed upstream \"## Feedback\" section (sends session details to browser-use.com); re-apply after each upstream update."
     },
     {
       "name": "camera-systems",
