@@ -431,8 +431,8 @@
     {
       "name": "ponytail",
       "source": "https://github.com/DietrichGebert/ponytail",
-      "sourceRevision": "9cc65d03aa2da1db7121b912d03596409ee340b8",
-      "treeSha256": "1e88b02f0419bf88fdd1d17c89735cc17db167b8a14a7aa7ed7f017cfa2a1baa",
+      "sourceRevision": "ebd8654c2c627f721eb8f9c0d1bd4090a29f9e10",
+      "treeSha256": "c3bc6e0d1388d9b1fc732a49bc6b6f5302362d17041709015cb0f8adbc97515a",
       "installPath": "~/.agents/skills/ponytail",
       "profiles": [
         "core"

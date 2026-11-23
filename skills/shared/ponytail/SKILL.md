@@ -8,7 +8,7 @@ description: >
   over-engineering, bloat, boilerplate, or unnecessary dependencies. Do NOT
   use for non-coding requests (general knowledge, prose, translation,
   summaries, recipes). Levels: lite, full (default), ultra.
-argument-hint: "[lite|full|ultra]"
+argument-hint: "[lite|full|ultra|off]"
 license: MIT
 ---
 
