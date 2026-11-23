@@ -466,7 +466,8 @@
       "installPath": "~/.agents/skills/resolving-merge-conflicts",
       "profiles": [
         "core"
-      ]
+      ],
+      "note": "Removed upstream in mattpocock/skills daa01d8; vendored copy kept at this revision."
     },
     {
       "name": "reverse-engineer-anything",
