@@ -54,8 +54,8 @@
     {
       "name": "camera-systems",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "b2bae14e2f5824c99bec8d2b8f25f909349cda85e525ad7a21c0647c67c89681",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "6236c5c689290629ba123f493530b6d65d7f9f44adef7dfd9fc0b1d3ab1f1fcd",
       "installPath": "~/.agents/skills/camera-systems",
       "profiles": [
         "gamedev"
@@ -94,8 +94,8 @@
     {
       "name": "create-game-assets",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "030a519baa76568896e9d62e122ab65ed7927037a89eaccb6f394a73b159b1e9",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "61f8f59904b14b9371690bef47bf2dc18cfd9facceb61698b9462a338bb1d35a",
       "installPath": "~/.agents/skills/create-game-assets",
       "profiles": [
         "gamedev"
@@ -134,8 +134,8 @@
     {
       "name": "game-ai",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "dfdad252ae6ecf131906253dbe041129861e0d070a7a37da54501f8f025bcf78",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "fca82754fb40405b3684d390323d913263661f4df802ae9a045f02bfe1ebb6b0",
       "installPath": "~/.agents/skills/game-ai",
       "profiles": [
         "gamedev"
@@ -144,8 +144,8 @@
     {
       "name": "game-feel",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "37241a335994139733740a93fc24a1917ca0c563786304d8b2f8ca400526af1f",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "f19aa7e30d305c23de9efe969a4b0cf1e26b17cad919c8cfc866606e7c215f62",
       "installPath": "~/.agents/skills/game-feel",
       "profiles": [
         "gamedev"
@@ -154,8 +154,8 @@
     {
       "name": "game-router",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "b4def358e4d483af961889ebd50d68d1bfd6e8ad706f8a5a17a32de7b6133eea",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "f3bbe5d327e5a88d82b6df7c5ac77ceae267b52653baa9df2afce292003d325f",
       "installPath": "~/.agents/skills/game-router",
       "profiles": [
         "gamedev"
@@ -164,8 +164,8 @@
     {
       "name": "game-ui-ux",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "be60340bb6ebb5e8356060d16bd56df3701c42749d5cefa36e906a0e3672870b",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "e0dc23db61ff6ce20cbb599318b4af18a26f1cb07d39ffa65e659374890bcd07",
       "installPath": "~/.agents/skills/game-ui-ux",
       "profiles": [
         "gamedev"
@@ -174,8 +174,8 @@
     {
       "name": "godot-3d-essentials",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "793691ff26273976ec8a9b42b9f7e1560129e56c885061ae00bc33a39a158785",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "305d5f5958ce752b2d599eb072ee1a9cab9a3b6d39f6c922f424ed009d12d7d6",
       "installPath": "~/.agents/skills/godot-3d-essentials",
       "profiles": [
         "gamedev"
@@ -184,8 +184,8 @@
     {
       "name": "godot-animation",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "bcd7ce1f137b15b66a13f2fd9e15fe30996cae3363546d7ff0d92d0756a636da",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "15fcf6645cd475e208385cb6345ab937c5ee257b5e3c5fa4747dd25a13fb283a",
       "installPath": "~/.agents/skills/godot-animation",
       "profiles": [
         "gamedev"
@@ -194,8 +194,8 @@
     {
       "name": "godot-audio",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "157a88e22a9157f9c967cc96e8e39535c04e5580f44f21ff3ab3239a65d00d53",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "be146275cf68179fc5c1867f2227a56eec709a0b3173b909b20933f867302f7d",
       "installPath": "~/.agents/skills/godot-audio",
       "profiles": [
         "gamedev"
@@ -204,8 +204,8 @@
     {
       "name": "godot-export",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "637ee2acc4bca1ceba48031604d95afce0b1372c52bc3911a161e68edd266032",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "625399a89d7b6654a89bb1153febe042805fb192cc367120d592c1661fdedbfa",
       "installPath": "~/.agents/skills/godot-export",
       "profiles": [
         "gamedev"
@@ -214,8 +214,8 @@
     {
       "name": "godot-gdscript",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "11579a9a58a5e6994a9425e356fee53c738288b224bf9651a8aa9dbab91c59e2",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "76377d13ef936d6a0a3e07db7ba899b5050402a0b2c9eea0b38d1acc5b770e7a",
       "installPath": "~/.agents/skills/godot-gdscript",
       "profiles": [
         "gamedev"
@@ -224,8 +224,8 @@
     {
       "name": "godot-gdscript-headless-testing",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "c52bed8df9f0f367ac5e519121e57ceb690c8a96c07f19dbc12db4aa6505d500",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "3efb4635ecc9a909682cbb2e7c97c13a8013ee821821419f741c0a8de514672f",
       "installPath": "~/.agents/skills/godot-gdscript-headless-testing",
       "profiles": [
         "gamedev"
@@ -234,8 +234,8 @@
     {
       "name": "godot-multiplayer",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "65306185901fee40687af90f5c54f9f2b3385b7e324b62f5b32f470cbd9546cb",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "e3b61d85e115037f18fec4ecc5d51ba69122badcc888be8fd739ef26b441d443",
       "installPath": "~/.agents/skills/godot-multiplayer",
       "profiles": [
         "gamedev"
@@ -244,8 +244,8 @@
     {
       "name": "godot-nodes-scenes",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "b809d340183030254a4814692a66a6417ce48ffb2e16a6aa63f598b45e608c4d",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "a39573e0e151d91ac0eaeffc73148a7ac25d6e825b38e4e0aadc360e94f6021a",
       "installPath": "~/.agents/skills/godot-nodes-scenes",
       "profiles": [
         "gamedev"
@@ -254,8 +254,8 @@
     {
       "name": "godot-physics",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "7f790fdb7f4ebbdbc453b1776ea3df6660f7b39ff2c311090161ee0a9d5aee96",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "211446c7e150edab2adde834f93991b115183763f4055ec5a46bac8b519a3076",
       "installPath": "~/.agents/skills/godot-physics",
       "profiles": [
         "gamedev"
@@ -264,8 +264,8 @@
     {
       "name": "godot-resources",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "de478ca6f349823853de8aa89938c2b49e0d8c8340d86a57e42f1e14d18872a5",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "01c9af1d3f00065ef14af0078338b75fbfd8c25dad53c4001b187ad302669a98",
       "installPath": "~/.agents/skills/godot-resources",
       "profiles": [
         "gamedev"
@@ -274,8 +274,8 @@
     {
       "name": "godot-shaders",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "f393a388601d65cd1815103b657e7b8057900af3335b044675e9bf58851c7cc7",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "eecdb4c926ce983cc281d015f12d7825bafe08618fbc5203b94bacae51f760fc",
       "installPath": "~/.agents/skills/godot-shaders",
       "profiles": [
         "gamedev"
@@ -284,8 +284,8 @@
     {
       "name": "godot-signals-groups",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "e877cdda7f58f7719ea301f68312c728ceb3953b34ba1cc6bee206333c6960db",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "a891473014239cc4b7106fe0d44a1518ba89e8399c69d2b292a9b57af47c75fe",
       "installPath": "~/.agents/skills/godot-signals-groups",
       "profiles": [
         "gamedev"
@@ -294,8 +294,8 @@
     {
       "name": "godot-ui-control",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "ce7f3057ded61fcfa608c7b8a6f684799d08e7bccbe8daeb08cbd9ead8571586",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "88d7bed5a562a592410d9fff29df2d77dde67bc0326b5cdc69ac9a84c93586de",
       "installPath": "~/.agents/skills/godot-ui-control",
       "profiles": [
         "gamedev"
@@ -383,8 +383,8 @@
     {
       "name": "input-systems",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "bcc53a4e201b7a500b513e70d8fcf8228fcfef9c0c6cbb66a02f11f8eb8e5643",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "c22ea7c48d2466a7cf1d4f39f12d6e1a1e4a2df14574fe252512c5acdabd43f4",
       "installPath": "~/.agents/skills/input-systems",
       "profiles": [
         "gamedev"
@@ -422,8 +422,8 @@
     {
       "name": "performance-optimization",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "1d6b99a3ee17635a70b8af7f99ed33dd9b6be19f95990d2dbab52f985b89c8fe",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "c89883727a91e9276ec0d272d0d7c60c74102439e3630d3f65d04555ee3a5392",
       "installPath": "~/.agents/skills/performance-optimization",
       "profiles": [
         "gamedev"
@@ -483,8 +483,8 @@
     {
       "name": "save-systems",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "ee715384b32e8a7c6d2e2d8c312c0d7a354d7a95685f04ac48a01e800e9fd6c2",
+      "sourceRevision": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+      "treeSha256": "0dcc50ef2a27a7ffa44d2d8ffa5e9d5d1caef3017600acb07e69f72323e9b712",
       "installPath": "~/.agents/skills/save-systems",
       "profiles": [
         "gamedev"

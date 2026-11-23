@@ -2,6 +2,9 @@
 
 Depth companion to `godot-export`.
 
+Contents: export_presets.cfg; Useful command-line flags; Custom feature tags; Web (HTML5)
+specifics; Android; macOS / iOS; PCK patching & DLC; Encryption.
+
 ## export_presets.cfg
 
 Generated/edited by *Project > Export*; commit it so CI and teammates share presets. It is
@@ -25,8 +28,10 @@ application/product_name="My Game"
 codesign/enable=false
 ```
 
-Sensitive values (keystore passwords, encryption keys) live in `export_presets.cfg` too —
-keep them out of public repos or inject them in CI rather than committing.
+Godot 4.7 stores ordinary, shareable export settings in `export_presets.cfg` and
+confidential options (keystore passwords, encryption keys) in
+`.godot/export_credentials.cfg`. Keep the credentials file out of version control;
+provide it securely or inject the required secrets in CI rather than committing them.
 
 ## Useful command-line flags
 
