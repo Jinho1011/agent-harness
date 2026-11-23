@@ -13,8 +13,8 @@
     {
       "name": "answer-me-with-html",
       "source": "https://github.com/QingYunA/answer-me-with-html",
-      "sourceRevision": "bc3798a87c5721b296b2d0f464c8fc4a0bcea2a5",
-      "treeSha256": "b2fa73fb5cc0225f63ebd41086e5be917bb1f572dbd1d3110fc79655d06c4a44",
+      "sourceRevision": "6fdfb0747b919de607fccb0a3f86fcb8d496dcda",
+      "treeSha256": "dd767c7533923e52dd65393e0fca940c5219499f592ab69eeff669aa432fe9c5",
       "installPath": "~/.agents/skills/answer-me-with-html",
       "profiles": [
         "core"
