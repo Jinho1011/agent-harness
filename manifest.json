@@ -43,8 +43,8 @@
     {
       "name": "browser-use",
       "source": "https://github.com/browser-use/browser-use",
-      "sourceRevision": "914c59bdd4acd50e9628a97a96a3919313aebc85",
-      "treeSha256": "fceede523c8956db46cc23561a3da392b78619f0b1646ff5388b81cab63fc442",
+      "sourceRevision": "753d629d76eb2b670f4cf467f3355bbe750f6845",
+      "treeSha256": "87fc05bef6da14f837d0bbb1057d047cad0e511168480ddfc1435eb92847d37a",
       "installPath": "~/.agents/skills/browser-use",
       "profiles": [
         "core"
