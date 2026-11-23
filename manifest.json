@@ -356,7 +356,7 @@
       "profiles": [
         "core"
       ],
-      "treeSha256": "5db6212d396e6657d89cb2ae18d8046f056d9b21f754a739265d1a245ff49970",
+      "treeSha256": "3daeb9dedea73a7f7d0d01e01e67bc626094d33661d15686b9b386809ba72023",
       "installPath": "~/.agents/skills/icloud-drive"
     },
     {

@@ -1,11 +1,11 @@
 ---
 name: icloud-drive
-description: Use iCloud Drive from this Ubuntu server through the existing rclone remote `icloud:`. Use when the user mentions iCloud, 아이클라우드, or iCloud Drive and wants to upload, download, list, or back up files, or when the iCloud login has expired and needs a new 2FA code; not for iCloud Photos downloads, calendar, contacts, or mail.
+description: Use iCloud Drive and iCloud Photos from this Ubuntu server through the existing rclone remote `icloud:`. Use when the user mentions iCloud, 아이클라우드, iCloud Drive, or iCloud Photos (아이클라우드 사진) and wants to upload, download, list, or back up files or photos, or when the iCloud login has expired and needs a new 2FA code; not for calendar, contacts, or mail.
 ---
 
-# iCloud Drive (rclone)
+# iCloud Drive와 Photos (rclone)
 
-이 서버에는 iCloud Drive가 rclone remote `icloud:`로 이미 연결되어 있다. 새로 설치하거나 로그인하지 않고 바로 쓴다.
+이 서버에는 iCloud Drive와 Photos가 rclone remote `icloud:`로 이미 연결되어 있다. 새로 설치하거나 로그인하지 않고 바로 쓴다.
 
 ## 전제
 
@@ -26,6 +26,24 @@ rclone copy icloud:폴더 /서버/경로         # iCloud -> 서버
 - 업로드 후에는 `rclone ls`나 `rclone check`로 올라갔는지 확인한다.
 - 속도가 느리다(작은 파일 하나에 수 초). 큰 작업은 백그라운드로 돌리고 진행 상황을 보고한다.
 - 사용자의 기존 iCloud 폴더(Documents, Desktop, pictures 등)에는 요청 없이 쓰거나 지우지 않는다. 테스트는 `_rclone-upload-test` 같은 새 폴더에서 하고 끝나면 지운다.
+
+## iCloud Photos (읽기 전용)
+
+같은 `icloud:` remote에 `--iclouddrive-service photos`를 붙이면 사진 라이브러리를 본다. 새 로그인은 필요 없다. 검증됨(앨범 목록, HEIC 1장 다운로드).
+
+```bash
+rclone lsd icloud: --iclouddrive-service photos                      # 라이브러리 (PrimarySync, SharedSync-...)
+rclone lsd icloud:PrimarySync/ --iclouddrive-service photos          # 앨범과 장수
+rclone lsf icloud:PrimarySync/Favorites/ --iclouddrive-service photos --files-only
+rclone copy "icloud:PrimarySync/Favorites/IMG_0001.HEIC" /서버/경로 --iclouddrive-service photos
+rclone copy icloud:PrimarySync/Favorites /서버/백업폴더 --iclouddrive-service photos --metadata
+```
+
+- **읽기 전용이다.** 업로드, 삭제, 이름 변경, 이동은 지원되지 않는다. 서버에서 iCloud 사진으로 올리는 것은 불가능하다.
+- 앨범 `All Photos`가 전체 사진이다. 큰 앨범(수천 장 이상)의 첫 목록 조회는 수 분 걸릴 수 있고, 이후는 `~/.cache/rclone/iclouddrive-photos/`의 캐시를 쓴다.
+- `library is still indexing, listings may be incomplete` 알림이 나오면 목록이 덜 나올 수 있다. 백업을 믿기 전에 장수를 다시 비교한다.
+- 대량 백업은 사용자가 대상 폴더와 용량을 확인한 뒤 시작하고, 백그라운드로 돌리며 진행 상황을 보고한다. 사진은 개인 자료이므로 요청 없이 내려받거나 내용을 열어보지 않는다.
+- 마운트가 필요하면 `rclone mount icloud: /경로 --iclouddrive-service photos --read-only --vfs-cache-mode full --dir-cache-time 1h`를 쓴다.
 
 ## 로그인 만료 시 (약 30일마다)
 
@@ -51,5 +69,5 @@ rclone copy icloud:폴더 /서버/경로         # iCloud -> 서버
 
 - 아이폰의 "웹에서 iCloud 데이터 접근"이 켜져 있어야 한다. 고급 데이터 보호(ADP)를 켠 계정은 실패할 수 있다.
 - 앱 암호는 쓸 수 없다. 실제 Apple ID 비밀번호와 2FA가 필요하다.
-- 사진 라이브러리 백업은 rclone이 아니라 `icloudpd` 계열이 맞다. 서버에는 아직 설치하지 않았다.
+- 캘린더, 연락처, 메일은 이 스킬 범위 밖이다(CalDAV/CardDAV/IMAP과 앱 암호가 필요하며 아직 설정하지 않았다).
 - 정기 업로드가 필요하면 user systemd 서비스와 타이머를 만들고 `10-on-failure.conf`(OnFailure 알림)를 붙인다.
