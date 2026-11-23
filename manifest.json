@@ -151,6 +151,16 @@
       ]
     },
     {
+      "name": "game-router",
+      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
+      "treeSha256": "b4def358e4d483af961889ebd50d68d1bfd6e8ad706f8a5a17a32de7b6133eea",
+      "installPath": "~/.agents/skills/game-router",
+      "profiles": [
+        "gamedev"
+      ]
+    },
+    {
       "name": "game-ui-ux",
       "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
       "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
@@ -466,16 +476,6 @@
       "installPath": "~/.agents/skills/reverse-engineer-anything",
       "profiles": [
         "core"
-      ]
-    },
-    {
-      "name": "router",
-      "source": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
-      "sourceRevision": "19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9",
-      "treeSha256": "dd1dae6a6fe89d9ffa8c855cb3f1178c4f3ae3d018a40d4ef1b905332e99bbe2",
-      "installPath": "~/.agents/skills/router",
-      "profiles": [
-        "gamedev"
       ]
     },
     {
