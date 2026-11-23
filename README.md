@@ -251,7 +251,7 @@ machines where Cursor is installed.
 | triage | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
 | unslop | [heydamir/unslop](https://github.com/heydamir/unslop) | core | auto |
 | wayfinder | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
-| writing-great-skills | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
+| writing-for-agents | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
 <!-- END:SKILLS_TABLE -->
 
 Upstream licenses are reproduced in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).

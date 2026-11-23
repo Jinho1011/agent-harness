@@ -8,7 +8,7 @@ Skills under `skills/shared/` are vendored from the repositories below at the co
 | `ponytail` | https://github.com/DietrichGebert/ponytail | `2ed6c52` | MIT |
 | `eli5` | https://github.com/dreambigou/eli5 | `a766623` | MIT |
 | `asd-ste100` | https://github.com/danyuchn/asd-ste100-skill | `fd86652` | MIT |
-| `ask-matt`, `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling`, `grill-me`, `grill-with-docs`, `grilling`, `handoff`, `implement`, `improve-codebase-architecture`, `prototype`, `research`, `resolving-merge-conflicts`, `setup-matt-pocock-skills`, `tdd`, `teach`, `to-spec`, `to-tickets`, `triage`, `wayfinder`, `writing-great-skills` | https://github.com/mattpocock/skills | `ed37663` | MIT |
+| `ask-matt`, `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling`, `grill-me`, `grill-with-docs`, `grilling`, `handoff`, `implement`, `improve-codebase-architecture`, `prototype`, `research`, `resolving-merge-conflicts`, `setup-matt-pocock-skills`, `tdd`, `teach`, `to-spec`, `to-tickets`, `triage`, `wayfinder`, `writing-for-agents` | https://github.com/mattpocock/skills | `ed37663` | MIT |
 
 ## mattpocock/skills
 

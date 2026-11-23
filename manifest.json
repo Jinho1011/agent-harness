@@ -578,11 +578,11 @@
       ]
     },
     {
-      "name": "writing-great-skills",
+      "name": "writing-for-agents",
       "source": "https://github.com/mattpocock/skills",
-      "sourceRevision": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
-      "treeSha256": "63c1761b0d0042bc3a42b2afee6b3b2433452cf2144d6080c1240530f79e9d92",
-      "installPath": "~/.agents/skills/writing-great-skills",
+      "sourceRevision": "abeeaf95660ba9e8b7c753eb38f441ca707a8823",
+      "treeSha256": "2829d7e7b23ab33101fa9f2e6f629ecbf833a98734d72fe243f3371239fb97e7",
+      "installPath": "~/.agents/skills/writing-for-agents",
       "profiles": [
         "core"
       ]
