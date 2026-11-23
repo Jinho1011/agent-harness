@@ -351,6 +351,15 @@
       ]
     },
     {
+      "name": "icloud-drive",
+      "source": "local",
+      "profiles": [
+        "core"
+      ],
+      "treeSha256": "5db6212d396e6657d89cb2ae18d8046f056d9b21f754a739265d1a245ff49970",
+      "installPath": "~/.agents/skills/icloud-drive"
+    },
+    {
       "name": "impeccable",
       "source": "https://github.com/pbakaus/impeccable",
       "sourceRevision": "b49177d32788f2dc585c42831d845dacf1ebed2c",

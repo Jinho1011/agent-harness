@@ -8,7 +8,7 @@ Install shared instructions, skill profiles, shell guards, a verifier and MCP se
 | Area | Targets and configuration |
 | --- | --- |
 | Instructions | Claude Code, Codex, Antigravity and Gemini CLI. Set Cursor User Rules manually. |
-| Shared skills (59) | Codex and Cursor read `~/.agents/skills`. Claude Code and Antigravity use symlinks. |
+| Shared skills (60) | Codex and Cursor read `~/.agents/skills`. Claude Code and Antigravity use symlinks. |
 | Shell guard | claude off, codex deny, cursor deny, antigravity ask |
 | Verifier | Claude Code, Codex and Antigravity. Copy into Cursor projects manually. |
 | MCP servers | blender (User), context7 (User), mobile-mcp (Project (optional)), rea (Project (optional)) |
@@ -228,6 +228,7 @@ machines where Cursor is installed.
 | grilling | [mattpocock/skills](https://github.com/mattpocock/skills) | core | auto |
 | handoff | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
 | html-report | local | core | auto |
+| icloud-drive | local | core | auto |
 | impeccable | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | core | auto |
 | implement | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |
 | improve-codebase-architecture | [mattpocock/skills](https://github.com/mattpocock/skills) | core | manual |

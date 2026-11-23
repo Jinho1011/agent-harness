@@ -1,0 +1,3 @@
+interface:
+  display_name: "iCloud Drive"
+  short_description: "Upload and download iCloud Drive files with rclone"
