@@ -401,8 +401,8 @@
     {
       "name": "orca-cli",
       "source": "https://github.com/stablyai/orca",
-      "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
-      "treeSha256": "2edff6af6fac216a2d6ff7f5a5575bfa59332ba5a7236e68f19225a9121479db",
+      "sourceRevision": "0b23e7a9d6098beb9d9fc11e97a71f3bf1dfe8d2",
+      "treeSha256": "87b25335b8de80f5204b7b99c9e8fec4e23741fa718858350f7b2d72cdaa5fed",
       "installPath": "~/.agents/skills/orca-cli",
       "profiles": [
         "core"
@@ -411,8 +411,8 @@
     {
       "name": "orchestration",
       "source": "https://github.com/stablyai/orca",
-      "sourceRevision": "76687bf4ffb0661abdec31c0a9d8256a6e8c9658",
-      "treeSha256": "3f6abcf68d8df39f7b66ca06e3f045b214df2e5b0b467b07f11c07b5359981d2",
+      "sourceRevision": "0b23e7a9d6098beb9d9fc11e97a71f3bf1dfe8d2",
+      "treeSha256": "33b7915e3a07d1f182e0b1c32afa2ae8444e79ede3ce959de826755a7158b73d",
       "installPath": "~/.agents/skills/orchestration",
       "profiles": [
         "core"
