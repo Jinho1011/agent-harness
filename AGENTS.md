@@ -110,6 +110,10 @@ works, style.
   Existing project requirements and explicitly requested browser tools take precedence.
 - Home, credential, PATH, and temporary paths come from the environment (`$HOME`, probing), never
   from a hardcoded machine.
+- When a task hits a CPU-bound hotspot worth porting to Rust, needs an agent-native CLI wrapper for
+  a GUI/service, or calls for an agent config security audit, check
+  `$(cat ~/.local/state/agent-harness/root)/docs/tool-radar.md` and propose the matching on-demand
+  tool before building from scratch.
 
 ## Host service guardrails
 
